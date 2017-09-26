@@ -9,12 +9,12 @@
  * Class MySQL_Tool
  *
  * This is used to build and maintain
- * a sql connection and different associated
- * functions
+ * a sql connection and run parameterized
+ * queries
  */
 
 // Includes
-include_once ("lib-utils.php");
+require_once "lib-utils.php";
 
 class MySQL_Tool
 {
@@ -39,7 +39,7 @@ class MySQL_Tool
      */
     public function __construct()
     {
-        require "lib-config.php";
+        require_once "lib-config.php";
         $this->servername = $global_servername;
         $this->username = $global_username;
         $this->password = $global_password;
@@ -106,32 +106,5 @@ class MySQL_Tool
     public function close()
     {
         $this->conn->close();
-    }
-
-    // -- Functions
-    // --------------------------------
-
-    /**
-     * Get the total sum of transactions for the week
-     */
-    public function getWeeklyTotal()
-    {   
-        $sql = "SELECT sum(amount) from Transactions where WEEKOFYEAR(dateOccured) = WEEKOFYEAR(NOW())";
-        $result = $this->query($sql);
-        $arr = $result->fetch_row();
-        $weeklyTotal = $arr[0];
-        return $weeklyTotal;
-    }
-
-    public function getRemaining($description)
-    {
-        $total = $this->getWeeklyTotal();
-        
-        $sql = 'SELECT amount from weekMaxValues where description = ?';
-        $result = $this->query($sql, array($description));
-        $arr = $result->fetch_row();
-        $budget = $arr[0];
-
-        return $budget - $total;
     }
 }
