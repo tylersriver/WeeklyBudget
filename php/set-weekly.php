@@ -2,6 +2,7 @@
 require_once "lib/lib-includes.php";
 
 $conn = new BudgetDB();
+$weeklyTotal = $conn->query("Select amount from from weekMaxValues where description = 'spending'")
 
 ?>
 <div>
