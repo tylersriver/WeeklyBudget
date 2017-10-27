@@ -16,6 +16,11 @@ class BudgetDB extends MySQL_Tool
         parent::__construct();
     }
 
+
+    // ** Select Functions ** //
+    // ******************************************************************************************************************* //
+    // ******************************************************************************************************************* //
+
     /**
      * Get the total sum of transactions for the week
      *
@@ -49,4 +54,24 @@ class BudgetDB extends MySQL_Tool
  
          return $budget - $total;
      }
+
+     /**
+      * Get the budget setting for the week 
+      *
+      * @return string
+      */
+     public function getWeeklyBudgetSetting()
+     {
+         $sql = "SELECT amount from weekMaxValues where description = 'spending'";
+         $result = $this->query($sql);
+         $arr = $result->fetch_row();
+         $budget = $arr[0];
+
+         return $budget;
+     }
+
+
+    // ** Insert/Update Functions ** //
+    // ******************************************************************************************************************* //
+    // ******************************************************************************************************************* //
 }
