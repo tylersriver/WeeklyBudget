@@ -12,8 +12,18 @@ $weeklyTotal = $conn->getWeeklyBudgetSetting();
 
 <div>
     <h2>Update Weekly Amount</h2>
-    <form action="proc_pages/insert-transaction.php" method="post">
+    <form name="budgetForm" action="proc_pages/update-weekly-budget.php" method="post">
         <table>
+        <tr>
+                <td valign="top">
+                    <label for="budgetType">Type</label>
+                </td>
+                <td valign="top">
+                    <select name="budgetType" form="budgetForm">
+                        <option value='weekly'>Weekly</option>
+                    </select>
+                </td>
+            </tr>
             <tr>
                 <td valign="top">
                     <label for="amount">Amount</label>

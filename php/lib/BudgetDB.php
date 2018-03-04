@@ -47,7 +47,7 @@ class BudgetDB extends MySQL_Tool
      {
          $total = $this->getWeeklyTotal();
          
-         $sql = 'SELECT amount from weekMaxValues where description = ?';
+         $sql = 'SELECT amount from budgets where budgetType = ?';
          $result = $this->query($sql, array($description));
          $arr = $result->fetch_row();
          $budget = $arr[0];
@@ -62,7 +62,7 @@ class BudgetDB extends MySQL_Tool
       */
      public function getWeeklyBudgetSetting()
      {
-         $sql = "SELECT amount from weekMaxValues where description = 'spending'";
+         $sql = "SELECT amount from budgets where budgetType = 'weekly'";
          $result = $this->query($sql);
          $arr = $result->fetch_row();
          $budget = $arr[0];
@@ -74,4 +74,17 @@ class BudgetDB extends MySQL_Tool
     // ** Insert/Update Functions ** //
     // ******************************************************************************************************************* //
     // ******************************************************************************************************************* //
+
+    /**
+     * Set a budget value
+     * 
+     * @param string $budgetType
+     * @param int $amount
+     */
+    public function setBudget($budgetType, $amount)
+    {
+        $sql = "Update budgets set amount = ? where budgetType = ?";
+        $params = array($amount, $budgetType);
+        $this->query($sql, $params);
+    }
 }
