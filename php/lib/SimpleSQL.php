@@ -1,18 +1,14 @@
 <?php
-
 /**
- * Created by PhpStorm.
- * User: tyler
- * Date: 4/11/2017
- * Time: 12:58 AM
+ * Class SimpleSQL
  *
- * Class MySQL
- *
- * This is used to build and maintain
- * a sql connection and run parameterized
- * queries
+ * Simplifies using MySQLi by maintaining a singleton instance
+ * and a simple query function to run paramterized queries.
+ * 
+ * Created By: Tyler Sriver
+ * @author <tyler.w.sriver@eagles.oc.edu>
  */
-class MySQLTool
+class SimpleSQL
 {
     // -- Connection Strings
     private  $servername = 'localhost';
@@ -23,15 +19,13 @@ class MySQLTool
     private $conn; // MySQLi Connection
     private static $instance = null;
 
-
-    // -- Methods
-    // ---------------------------------------------------
     private function __construct()
     {
         $this->conn = new mysqli($this->servername, $this->username, $this->password, $this->db);
         if($this->conn->connect_error){
             die("Connection failed: " . $this->conn->connect_error);
-        }    }
+        }    
+    }
 
     public static function getInstance()
     {
@@ -39,6 +33,11 @@ class MySQLTool
             self::$instance = new MySQLTool();
         }
         return self::$instance;
+    }
+
+    public function close()
+    {
+        $this->conn->close();
     }
 
     private function __clone() {}
@@ -87,14 +86,6 @@ class MySQLTool
         return $result;
     }
 
-    public function close()
-    {
-        $this->conn->close();
-    }
-
-    // -- Utilities
-    // ------------------------------------------------------------------------------
-    
     /**
      * Make array pass by reference
      * 
