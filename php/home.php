@@ -3,7 +3,7 @@ require_once "lib/lib-includes.php";
 
 // Pull remaining for week
 $weeklyTotal = BudgetDB::getWeeklyTotal();
-$remaining = BudgetDB::getRemaining('spending');
+$remaining = BudgetDB::getRemaining('weekly');
 
 ?>
 
