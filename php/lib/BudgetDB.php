@@ -9,14 +9,8 @@ require_once "MySQL_Tool.php";
  * bas MySQL Tool to add specific methods
  * used by the WeeklyBudget
  */
-class BudgetDB extends MySQL_Tool
+class BudgetDB
 {
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-
     // ** Select Functions ** //
     // ******************************************************************************************************************* //
     // ******************************************************************************************************************* //
@@ -26,10 +20,10 @@ class BudgetDB extends MySQL_Tool
      *
      * @return float
      */
-     public function getWeeklyTotal()
+     public static function getWeeklyTotal()
      {   
          $sql = "SELECT sum(amount) from Transactions where WEEKOFYEAR(dateOccured) = WEEKOFYEAR(NOW())";
-         $result = $this->query($sql);
+         $result = MySQLTool::query($sql);
          $arr = $result->fetch_row();
          $weeklyTotal = $arr[0];
          return $weeklyTotal;
@@ -43,12 +37,12 @@ class BudgetDB extends MySQL_Tool
       *
       * @return float
       */
-     public function getRemaining($description)
+     public static function getRemaining($description)
      {
-         $total = $this->getWeeklyTotal();
+         $total = BudgetDB::getWeeklyTotal();
          
          $sql = 'SELECT amount from budgets where budgetType = ?';
-         $result = $this->query($sql, array($description));
+         $result = MySQLTool::query($sql, array($description));
          $arr = $result->fetch_row();
          $budget = $arr[0];
  
@@ -60,10 +54,10 @@ class BudgetDB extends MySQL_Tool
       *
       * @return string
       */
-     public function getWeeklyBudgetSetting()
+     public static function getWeeklyBudgetSetting()
      {
          $sql = "SELECT amount from budgets where budgetType = 'weekly'";
-         $result = $this->query($sql);
+         $result = MySQLTool::query($sql);
          $arr = $result->fetch_row();
          $budget = $arr[0];
 
@@ -81,10 +75,10 @@ class BudgetDB extends MySQL_Tool
      * @param string $budgetType
      * @param int $amount
      */
-    public function setBudget($budgetType, $amount)
+    public static function setBudget($budgetType, $amount)
     {
         $sql = "Update budgets set amount = ? where budgetType = ?";
         $params = array($amount, $budgetType);
-        $this->query($sql, $params);
+        MySQLTool::query($sql, $params);
     }
 }

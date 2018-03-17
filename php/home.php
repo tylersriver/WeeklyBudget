@@ -2,9 +2,8 @@
 require_once "lib/lib-includes.php";
 
 // Pull remaining for week
-$conn = new BudgetDB();
-$weeklyTotal = $conn->getWeeklyTotal();
-$remaining = $conn->getRemaining('spending');
+$weeklyTotal = BudgetDB::getWeeklyTotal();
+$remaining = BudgetDB::getRemaining('spending');
 
 ?>
 

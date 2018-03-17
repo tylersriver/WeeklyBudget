@@ -1,8 +1,7 @@
 <?php
 require_once "lib/lib-includes.php";
 
-$conn = new BudgetDB();
-$weeklyTotal = $conn->getWeeklyBudgetSetting();
+$weeklyTotal = BudgetDB::getWeeklyBudgetSetting();
 
 ?>
 <div>
