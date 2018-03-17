@@ -30,9 +30,14 @@ class SimpleSQL
     public static function getInstance()
     {
         if(!self::$instance) {
-            self::$instance = new MySQLTool();
+            self::$instance = new SimpleSQL();
         }
         return self::$instance;
+    }
+
+    public function getConn()
+    {
+        return $this->conn;
     }
 
     public function close()
@@ -42,97 +47,98 @@ class SimpleSQL
 
     private function __clone() {}
     private function __wakeup() {}
+}
 
-    /**
-     * MySQLi bound query function
-     *
-     * @param $sql string
-     * @param $params array
-     * @return bool | mysqli_result
-     */
-    public static function query($sql, $params = array())
-    {
-        $db = MySQLTool::getInstance();
-        $sql = trim($sql); // Trim extra whitespace
-        $params = (array)$params;
-        $result = false;
+/**
+ * MySQLi bound query function
+ *
+ * @param $sql string
+ * @param $params array
+ * @return bool | mysqli_result
+ */
+function query($sql, $params = array())
+{
+    $db = SimpleSQL::getInstance();
+    $sql = trim($sql); // Trim extra whitespace
+    $params = (array)$params;
+    $result = false;
 
-        // Initiate statement
-        $stmt = $db->conn->prepare($sql);
-        if(!$stmt) {
-            return $result;
-        }
-        
-        // Build types array
-        $types = $db->buildTypeStringFromArray($params);
-
-        // Bind params
-        if (!empty($params)) {
-            $binds = array($types);
-            $binds = array_merge($binds, $params);
-            $binds = $db->makeValuesReferenced($binds);
-            call_user_func_array(array($stmt, 'bind_param'), $binds);
-        }
-
-        // Execute SQL
-        if($stmt->execute()) {
-            if($stmt->affected_rows >= 0 ) {
-                $result = true;
-            } else {
-                $result = $stmt->get_result();
-            }
-        }
-
+    // Initiate statement
+    $conn = $db->getConn();
+    $stmt = $conn->prepare($sql);
+    if(!$stmt) {
         return $result;
     }
+    
+    // Build types array
+    $types = buildTypeStringFromArray($params);
 
-    /**
-     * Make array pass by reference
-     * 
-     * @param $arr array
-     * @return array
-     */
-    private function makeValuesReferenced(&$arr)
-    {
-        $refs = array();
-        foreach($arr as $key => $value){
-            $refs[$key] = &$arr[$key];
-        }
-        return $refs;
+    // Bind params
+    if (!empty($params)) {
+        $binds = array($types);
+        $binds = array_merge($binds, $params);
+        $binds = makeValuesReferenced($binds);
+        call_user_func_array(array($stmt, 'bind_param'), $binds);
     }
 
-    /**
-     * Build string of types from an array
-     *
-     * Possible types:
-     *  boolean b
-     *  double d
-     *  integer i
-     *  string s
-     *
-     * @param $parms array
-     * @return string
-     */
-    private function buildTypeStringFromArray($params)
-    {
-        $types = "";
-        foreach($params as &$p){
-            switch (gettype($p)) {
-                case 'boolean':
-                    $bind = $bind ? 1 : 0;
-                    $types .= 'i';
-                    break;
-                case 'double':
-                    $types .= 'd';
-                    break;
-                case 'integer':
-                    $types .= 'i';
-                    break;
-                case 'string':
-                default:
-                    $types .= 's';
-            }
+    // Execute SQL
+    if($stmt->execute()) {
+        if($stmt->affected_rows >= 0 ) {
+            $result = true;
+        } else {
+            $result = $stmt->get_result();
         }
-        return $types;
     }
+
+    return $result;
+}
+
+/**
+ * Make array pass by reference
+ * 
+ * @param $arr array
+ * @return array
+ */
+function makeValuesReferenced(&$arr)
+{
+    $refs = array();
+    foreach($arr as $key => $value){
+        $refs[$key] = &$arr[$key];
+    }
+    return $refs;
+}
+
+/**
+ * Build string of types from an array
+ *
+ * Possible types:
+ *  boolean b
+ *  double d
+ *  integer i
+ *  string s
+ *
+ * @param $parms array
+ * @return string
+ */
+function buildTypeStringFromArray($params)
+{
+    $types = "";
+    foreach($params as &$p){
+        switch (gettype($p)) {
+            case 'boolean':
+                $bind = $bind ? 1 : 0;
+                $types .= 'i';
+                break;
+            case 'double':
+                $types .= 'd';
+                break;
+            case 'integer':
+                $types .= 'i';
+                break;
+            case 'string':
+            default:
+                $types .= 's';
+        }
+    }
+    return $types;
 }

@@ -23,7 +23,7 @@ class BudgetDB
      public static function getWeeklyTotal()
      {   
          $sql = "SELECT sum(amount) from Transactions where WEEKOFYEAR(dateOccured) = WEEKOFYEAR(NOW())";
-         $result = SimpleSQL::query($sql);
+         $result = query($sql);
          $arr = $result->fetch_row();
          $weeklyTotal = $arr[0];
          return $weeklyTotal;
@@ -42,7 +42,7 @@ class BudgetDB
          $total = BudgetDB::getWeeklyTotal();
          
          $sql = 'SELECT amount from budgets where budgetType = ?';
-         $result = SimpleSQL::query($sql, array($description));
+         $result = query($sql, array($description));
          $arr = $result->fetch_row();
          $budget = $arr[0];
  
@@ -57,7 +57,7 @@ class BudgetDB
      public static function getWeeklyBudgetSetting()
      {
          $sql = "SELECT amount from budgets where budgetType = 'weekly'";
-         $result = SimpleSQL::query($sql);
+         $result = query($sql);
          $arr = $result->fetch_row();
          $budget = $arr[0];
 
@@ -79,6 +79,6 @@ class BudgetDB
     {
         $sql = "Update budgets set amount = ? where budgetType = ?";
         $params = array($amount, $budgetType);
-        SimpleSQL::query($sql, $params);
+        query($sql, $params);
     }
 }
