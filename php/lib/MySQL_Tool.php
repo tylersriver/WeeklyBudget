@@ -14,14 +14,13 @@
  */
 class MySQLTool
 {
-    // -- Fields
-    // ---------------------------------------------------
+    // -- Connection Strings
     private  $servername = 'localhost';
     private  $username = 'dev_user';
     private  $password = 'ILoveJennifer712';
     private  $db = 'WeeklyBudget';
 
-    private $conn;
+    private $conn; // MySQLi Connection
     private static $instance = null;
 
 
