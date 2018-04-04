@@ -16,20 +16,23 @@
 
   </head>
   <body>
-    <h1 class="budget-h">Budget</h1>
-    <header>
-        <ul class="nav nav-tabs">
-            <li class="nav-item">
-                <a class="nav-link active" href='/xampp/WeeklyBudget'>Overview</a>
-            </li>
-            <li>
-                <a class="nav-link" href='/xampp/WeeklyBudget?controller=pages&action=history'>History</a>
-            </li>
-            <li>
-                <a class="nav-link" href='/xampp/WeeklyBudget?controller=pages&action=budget'>Budget</a>
-            </li>
-        </ul>
-    </header>
+    <nav class="navbar navbar-expand navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">Sriver Budget</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="/xampp/WeeklyBudget">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/xampp/WeeklyBudget?controller=pages&action=budget">Budgets</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
 
     <?php require_once('routes.php'); ?>
 

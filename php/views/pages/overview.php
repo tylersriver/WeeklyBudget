@@ -1,6 +1,6 @@
-<div class="row m-1">
-    <div class="col-12">
-        <div class="container baseContainer">
+<div class="container">
+    <div class="row">
+        <div class="baseContainer col-12">
             <h2>Remaining</h2>
             <div class="remaining-group">
                 <div class="row remaining-row">
@@ -14,8 +14,8 @@
             </div>
         </div>
     </div>
-    <div class="col-12">
-        <div class="container baseContainer">
+    <div class="row">
+        <div class="baseContainer col-12">
             <h2>Add Transaction</h2>
             <form action="/php/WeeklyBudget">
                 <div class="form-group row">
@@ -52,9 +52,9 @@
             </form>
         </div>
     </div>
-</div>
-<div class="row m-1">
-    <div class="container baseContainer">
-        <h2>Transactions This Week</h2>
+    <div class="row ">
+        <div class="baseContainer col-12">
+            <h2>Transactions This Week</h2>
+        </div>
     </div>
 </div>
