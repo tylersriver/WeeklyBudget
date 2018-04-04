@@ -22,6 +22,12 @@
             <li class="nav-item">
                 <a class="nav-link active" href='/xampp/WeeklyBudget'>Overview</a>
             </li>
+            <li>
+                <a class="nav-link" href='/xampp/WeeklyBudget?controller=pages&action=history'>History</a>
+            </li>
+            <li>
+                <a class="nav-link" href='/xampp/WeeklyBudget?controller=pages&action=budget'>Budget</a>
+            </li>
         </ul>
     </header>
 

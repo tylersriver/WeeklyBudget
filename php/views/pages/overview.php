@@ -17,7 +17,7 @@
     <div class="col-12">
         <div class="container baseContainer">
             <h2>Add Transaction</h2>
-            <form>
+            <form action="">
                 <div class="form-group row">
                     <label for="type" class="col-sm-2 col-form-label">Type</label>
                     <div class="col-sm-10">

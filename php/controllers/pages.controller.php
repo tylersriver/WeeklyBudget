@@ -10,5 +10,13 @@ class PagesController
         require_once('php/views/pages/overview.php');
     }
 
+    /** 
+     * Show error page
+     */
+    public function error() 
+    {
+        require_once('php/views/pages/error.php');
+    }
+
 }
 
