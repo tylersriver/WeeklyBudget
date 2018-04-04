@@ -58,10 +58,7 @@ class BudgetDB
      {
          $sql = "SELECT amount from budgets where budgetType = 'weekly'";
          $result = query($sql);
-         $arr = $result->fetch_row();
-         $budget = $arr[0];
-
-         return $budget;
+         return $result[0]['amount'];
      }
 
 
