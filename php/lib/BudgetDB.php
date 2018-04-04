@@ -22,11 +22,9 @@ class BudgetDB
      */
      public static function getWeeklyTotal()
      {   
-         $sql = "SELECT sum(amount) from Transactions where WEEKOFYEAR(dateOccured) = WEEKOFYEAR(NOW())";
+         $sql = "SELECT sum(amount) as total from Transactions where WEEKOFYEAR(dateAdded) = WEEKOFYEAR(NOW())";
          $result = query($sql);
-         $arr = $result->fetch_row();
-         $weeklyTotal = $arr[0];
-         return $weeklyTotal;
+         return $result[0]['total'];
      }
  
      /**
@@ -40,11 +38,13 @@ class BudgetDB
      public static function getRemaining($description)
      {
          $total = BudgetDB::getWeeklyTotal();
+         if($total = null){
+             $total = 0;
+         }
          
          $sql = 'SELECT amount from budgets where budgetType = ?';
          $result = query($sql, array($description));
-         $arr = $result->fetch_row();
-         $budget = $arr[0];
+         $budget = $result[0]['amount'];
  
          return $budget - $total;
      }

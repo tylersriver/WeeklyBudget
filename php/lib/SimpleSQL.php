@@ -67,7 +67,7 @@ function query($sql, $params = array())
     $conn = $db->getConn();
     $stmt = $conn->prepare($sql);
     if(!$stmt) {
-        return $result;
+        die('SQL Error: ' . $sql);
     }
     
     // Build types array
@@ -87,6 +87,13 @@ function query($sql, $params = array())
             $result = true;
         } else {
             $result = $stmt->get_result();
+            if($result != null && $result != false) {
+                $data = array(); 
+                while($row = $result->fetch_assoc()) {
+                    $data[] = $row;
+                }
+                return $data;
+            }
         }
     }
 

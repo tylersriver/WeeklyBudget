@@ -5,7 +5,7 @@
             <div class="remaining-group">
                 <div class="row remaining-row">
                     <label class="col-2">This Week</label>
-                    <div class="col-10">$150</div>
+                    <div class="col-10">$<?php echo BudgetDB::getRemaining('weekly'); ?></div>
                 </div>
                 <div class="row remaining-row">
                     <label class="col-2">This Month</label>
@@ -17,7 +17,7 @@
     <div class="col-12">
         <div class="container baseContainer">
             <h2>Add Transaction</h2>
-            <form action="">
+            <form action="/php/WeeklyBudget">
                 <div class="form-group row">
                     <label for="type" class="col-sm-2 col-form-label">Type</label>
                     <div class="col-sm-10">
