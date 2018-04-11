@@ -6,9 +6,10 @@ function call($controller, $action)
     switch($controller) {
       case 'pages':
         $controller = new PagesController();
-      break;
-      case 'posts':
-      break;
+        break;
+      case 'transactions':
+        $controller = new TransactionsController();
+        break;
     }
 
     $controller->{ $action }();
@@ -16,7 +17,7 @@ function call($controller, $action)
 
   // we're adding an entry for the new controller and its actions
   $controllers = array('pages' => ['overview', 'error'],
-                       'proc' => ['transaction']);
+                       'transactions' => ['insert']);
 
   if (array_key_exists($controller, $controllers)) {
     if (in_array($action, $controllers[$controller])) {

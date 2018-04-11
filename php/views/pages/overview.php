@@ -1,27 +1,56 @@
+<?php
+
+// Budget Variables
+$remaining = BudgetDB::getRemaining('weekly');
+$spent = BudgetDB::getWeeklySpent();
+$budget = BudgetDB::getBudgetSetting('weekly');
+$budgetMonth = BudgetDB::getBudgetSetting('month');
+
+?>
+
 <div class="container">
     <div class="row">
         <div class="baseContainer col-12">
             <h2>Remaining</h2>
-            <div class="remaining-group">
-                <div class="row remaining-row">
-                    <label class="col-2">This Week</label>
-                    <div class="col-10">$<?php echo BudgetDB::getRemaining('weekly'); ?></div>
-                </div>
-                <div class="row remaining-row">
-                    <label class="col-2">This Month</label>
-                    <div class="col-10">$400</div>
-                </div>
+            <div class="col-12">
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr>
+                            <th>Budget</th>
+                            <th style='width: 65%'>Spent</th>
+                            <th>Remaining</th>
+                        </tr>
+                        <tr>
+                            <td>Weekly</td>
+                            <td>
+                                <div class="progress" style="height: 25px;">
+                                <div class="progress-bar budget-progress" style="width: <?php echo ($spent/$budget*100); ?>%;">$<?php echo $spent; ?></div>
+                            </div>
+                            </td>
+                            <td>$<?php echo $remaining; ?> of $<?php echo $budget ?> Left</td>
+                        </tr>
+                        <tr>
+                            <td>Monthly</td>
+                            <td>
+                                <div class="progress" style="height: 25px;">
+                                <div class="progress-bar budget-progress" style="width: <?php echo ($spent/$budgetMonth*100); ?>%;">$<?php echo $spent; ?></div>
+                            </div>
+                            </td>
+                            <td>$<?php echo $budgetMonth - $spent; ?> of $<?php echo $budgetMonth ?> Left</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
     <div class="row">
         <div class="baseContainer col-12">
             <h2>Add Transaction</h2>
-            <form action="/php/WeeklyBudget">
+            <form class="form-horizontal" action="?controller=transactions&action=insert" method='POST'>
                 <div class="form-group row">
                     <label for="type" class="col-sm-2 col-form-label">Type</label>
                     <div class="col-sm-10">
-                        <select class="form-control" id="type">
+                        <select name='type' class="form-control" id="type">
                             <option>Food</option>
                             <option>Groceries</option>
                             <option>Gas</option>
@@ -33,19 +62,19 @@
                 <div class="form-group row">
                     <label for="description" class="col-sm-2 col-form-label">Description</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="description" placeholder="Description">
+                        <input type="text" name='description' class="form-control" id="description" placeholder="Description">
                     </div>
                 </div>
                 <div class="form-group row">
                     <label for="date" class="col-sm-2 col-form-label">Amount</label>
                     <div class="col-sm-10">
-                        <input type="number" class="form-control" id="amount" placeholder="Amount">
+                        <input type="number" name='amount' step="0.01" class="form-control" id="amount" placeholder="Amount">
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label for="amount" class="col-sm-2 col-form-label">Date</label>
+                    <label for="date" class="col-sm-2 col-form-label">Date</label>
                     <div class="col-sm-10">
-                        <input type="date" class="form-control" id="date" placeholder="Date">
+                        <input type="date" name='date' class="form-control" id="date" placeholder="Date">
                     </div>
                 </div>
                 <button type="submit" class="btn btn-primary">Save</button>

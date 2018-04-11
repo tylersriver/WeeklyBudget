@@ -20,11 +20,14 @@ class BudgetDB
      *
      * @return float
      */
-     public static function getWeeklyTotal()
+     public static function getWeeklySpent()
      {   
          $sql = "SELECT sum(amount) as total from Transactions where WEEKOFYEAR(dateAdded) = WEEKOFYEAR(NOW())";
          $result = query($sql);
-         return $result[0]['total'];
+
+        $val = ($result[0]['total'] == null) ? 0 : $result[0]['total'];
+
+         return $val;
      }
  
      /**
@@ -37,10 +40,7 @@ class BudgetDB
       */
      public static function getRemaining($description)
      {
-         $total = BudgetDB::getWeeklyTotal();
-         if($total = null){
-             $total = 0;
-         }
+         $total = BudgetDB::getWeeklySpent();
          
          $sql = 'SELECT amount from budgets where budgetType = ?';
          $result = query($sql, array($description));
@@ -52,12 +52,13 @@ class BudgetDB
      /**
       * Get the budget setting for the week 
       *
+      * @param string $type
       * @return string
       */
-     public static function getWeeklyBudgetSetting()
+     public static function getBudgetSetting($type)
      {
-         $sql = "SELECT amount from budgets where budgetType = 'weekly'";
-         $result = query($sql);
+         $sql = "SELECT amount from budgets where budgetType = ?";
+         $result = query($sql, array($type));
          return $result[0]['amount'];
      }
 
@@ -77,5 +78,19 @@ class BudgetDB
         $sql = "Update budgets set amount = ? where budgetType = ?";
         $params = array($amount, $budgetType);
         query($sql, $params);
+    }
+
+    /**
+     * Insert the transaction into the DB
+     * 
+     * @param string $type
+     * @param string $description
+     * @param string amount
+     * @param string date
+     */
+    public static function insertTransaction($type, $description, $amount, $date)
+    {
+        $sql = 'INSERT INTO transactions (type, description, amount, dateAdded) values (?,?,?,?)';
+        query($sql, array($type, $description, $amount, $date));
     }
 }
