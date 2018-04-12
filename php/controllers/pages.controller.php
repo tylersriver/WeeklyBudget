@@ -22,6 +22,15 @@ class PagesController
         require_once('php/views/pages/overview.php');
     }
 
+    /**
+     * Show history page
+     */
+    public function history()
+    {
+        // Show view
+        require_once('php/views/pages/history.php');
+    }
+
     /** 
      * Show error page
      */

@@ -7,7 +7,7 @@
                     <tbody>
                         <tr>
                             <th>Budget</th>
-                            <th style='width: 65%'>Spent</th>
+                            <th style='width: 60%'>Spent</th>
                             <th>Remaining</th>
                         </tr>
                         <tr>
@@ -33,14 +33,20 @@
             </div>
         </div>
     </div>
+    <div class="row ">
+        <div class="baseContainer col-12">
+            <h2>Transactions This Week</h2>
+            <?php echo $transactionsTable; ?>
+        </div>
+    </div>
     <div class="row">
         <div class="baseContainer col-12">
             <h2>Add Transaction</h2>
             <form class="form-horizontal" action="?controller=transactions&action=insert" method='POST'>
                 <div class="form-group row">
-                    <label for="type" class="col-sm-2 col-form-label">Type</label>
+                    <label for="type" class="col-sm-2 col-form-label col-form-label-sm">Type</label>
                     <div class="col-sm-10">
-                        <select name='type' class="form-control" id="type">
+                        <select name='type' class="form-control form-control-sm" id="type">
                             <option>Food</option>
                             <option>Groceries</option>
                             <option>Gas</option>
@@ -50,31 +56,25 @@
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label for="description" class="col-sm-2 col-form-label">Description</label>
+                    <label for="description" class="col-sm-2 col-form-label col-form-label-sm">Description</label>
                     <div class="col-sm-10">
-                        <input type="text" name='description' class="form-control" id="description" placeholder="Description">
+                        <input type="text" name='description' class="form-control form-control-sm" id="description" placeholder="Description">
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label for="date" class="col-sm-2 col-form-label">Amount</label>
+                    <label for="date" class="col-sm-2 col-form-label col-form-label-sm">Amount</label>
                     <div class="col-sm-10">
-                        <input type="number" name='amount' step="0.01" class="form-control" id="amount" placeholder="Amount">
+                        <input type="number" name='amount' step="0.01" class="form-control form-control-sm" id="amount" placeholder="Amount">
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label for="date" class="col-sm-2 col-form-label">Date</label>
+                    <label for="date" class="col-sm-2 col-form-label col-form-label-sm">Date</label>
                     <div class="col-sm-10">
-                        <input type="date" name='date' class="form-control" id="date" placeholder="Date">
+                        <input type="date" name='date' class="form-control form-control-sm" id="date" placeholder="Date">
                     </div>
                 </div>
                 <button type="submit" class="btn btn-primary">Save</button>
             </form>
-        </div>
-    </div>
-    <div class="row ">
-        <div class="baseContainer col-12">
-            <h2>Transactions This Week</h2>
-            <?php echo $transactionsTable; ?>
         </div>
     </div>
 </div>
