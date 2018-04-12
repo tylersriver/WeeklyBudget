@@ -37,7 +37,7 @@
     <?php require_once('routes.php'); ?>
 
     <footer>
-        <div class="footer"> Copyright Tyler Sriver | 2018 </div
+        <div class="footer"> Copyright Tyler Sriver | 2018 | <a href='https://github.com/tylersriver/WeeklyBudget'>GitHub Repo</a></div>
     </footer>
 
     <!-- JQuery -->
