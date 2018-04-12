@@ -28,7 +28,7 @@
                     <a class="nav-link" href="?">Home <span class="sr-only">(current)</span></a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="?controller=pages&action=budget">Budgets</a>
+                    <a class="nav-link" href="?controller=pages&action=budgets">Budgets</a>
                 </li>
             </ul>
         </div>

@@ -107,7 +107,7 @@ class SimpleTable
     function setTheadDarkOrLight($color)
     {
         if($color == 'dark') {
-            $this->$theadColor = 'thead-dark';
+            $this->theadColor = 'thead-dark';
         } else if ($color == 'light') {
             $this->theadColor = 'thead-light';
         } else {

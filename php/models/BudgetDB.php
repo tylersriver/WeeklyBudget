@@ -79,6 +79,16 @@ class BudgetDB
         return query($sql);
      }
 
+     /**
+      * Get all current budgets
+      * @return array
+      */
+     public static function getCurrentBudgets()
+     {
+         $sql = 'select id as ID, budgetType as Budget, amount as Amount from budgets';
+         return query($sql);
+     }
+
 
     // ** Insert/Update Functions ** //
     // ******************************************************************************************************************* //

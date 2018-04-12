@@ -13,7 +13,7 @@ class TransactionsViewModel
 
         // Build Table
         $table = new SimpleTable('table1');
-        $table->setTableClasses(array(BootStrapTableClasses::Hover, BootStrapTableClasses::Striped));
+        $table->setTableClasses(array(BootStrapTableClasses::Hover, BootStrapTableClasses::Striped, BootStrapTableClasses::Small));
         $table->setData($data);
         return $table->display(true);
     }

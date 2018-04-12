@@ -30,5 +30,21 @@ class PagesController
         require_once('php/views/pages/error.php');
     }
 
+    /**
+     * Show budgets page
+     */
+    public function budgets()
+    {
+        // Current Budgets Table
+        $currentBudgets = BudgetDB::getCurrentBudgets();
+        $budgetTable = new SimpleTable('budgets_table');
+        $budgetTable->setTableClasses(array(BootStrapTableClasses::Hover, BootStrapTableClasses::Striped, BootStrapTableClasses::Bordered));
+        $budgetTable->setData($currentBudgets);
+        $budgetTable = $budgetTable->display(true);
+
+        // Show view
+        require_once('php/views/pages/budgets.php');
+    }
+
 }
 
