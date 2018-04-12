@@ -70,7 +70,7 @@ class BudgetDB
      {
          $sql = "select 
                     id as ID, 
-                    dateAdded as `Date`,
+                    date_format(dateAdded, '%d/%m/%Y') as `Date`,
                     type as Type, 
                     description as Description, 
                     amount as Amount
