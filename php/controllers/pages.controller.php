@@ -14,7 +14,6 @@ class PagesController
         $remaining = BudgetDB::getRemaining('weekly');
         $spent = BudgetDB::getWeeklySpent();
         $budget = BudgetDB::getBudgetSetting('weekly');
-        $budgetMonth = BudgetDB::getBudgetSetting('month');
 
         // Get Transactions table
         $transactionsTable = TransactionsViewModel::getThisWeeksTransactionsTable();

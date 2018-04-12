@@ -16,7 +16,7 @@ function call($controller, $action)
 }
 
   // we're adding an entry for the new controller and its actions
-  $controllers = array('pages' => ['overview', 'error'],
+  $controllers = array('pages' => ['overview', 'error', 'budgets'],
                        'transactions' => ['insert']);
 
   if (array_key_exists($controller, $controllers)) {

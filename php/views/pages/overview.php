@@ -23,10 +23,10 @@
                             <td>Monthly</td>
                             <td>
                                 <div class="progress" style="height: 30px;">
-                                <div class="progress-bar budget-progress bg-success" style="width: <?php echo ($spent/$budgetMonth*100); ?>%;">$<?php echo $spent; ?></div>
+                                <div class="progress-bar budget-progress bg-success" style="width: <?php echo ($spent/($budget*4)*100); ?>%;">$<?php echo $spent; ?></div>
                             </div>
                             </td>
-                            <td>$<?php echo $budgetMonth - $spent; ?> of $<?php echo $budgetMonth ?></td>
+                            <td>$<?php echo $budget*4 - $spent; ?> of $<?php echo $budget*4 ?></td>
                         </tr>
                     </tbody>
                 </table>
