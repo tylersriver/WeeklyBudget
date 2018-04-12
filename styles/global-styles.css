@@ -1,28 +1,23 @@
-ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    background-color: #333;
+.baseContainer {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    border-top: 3px solid #343a40;
+    border-radius: 3px;
+    box-shadow: 1px 1px 1px 1px grey;
 }
 
-li {
-    float: left;
-}
-
-li a {
-    display: block;
-    color: white;
+.footer {
+    margin: 30px;
+    border-top: 1px solid #343a40;
     text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
+    font-size: 12px 
 }
 
-li a:hover {
-    background-color: #111;
+.budget-h {
+    margin-left: 15px;
 }
 
-body {
-    background-color: lightgrey;
-    font-family: Consolas;
+.budget-progress {
+    color: black; 
+    font-weight: bold;
 }
