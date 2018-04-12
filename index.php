@@ -2,6 +2,7 @@
 
 // PHP Includes
 require_once('php/models/BudgetDB.php'); 
+require_once('php/lib/SimpleTable.php'); 
 
 if(isset($_GET['controller']) && isset($_GET['action']) ) {
     $controller = $_GET['controller'];

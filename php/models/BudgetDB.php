@@ -62,6 +62,23 @@ class BudgetDB
          return $result[0]['amount'];
      }
 
+     /**
+      * Retrieves data for each transaction for this week
+      * @return array
+      */
+     public static function getTransactionsThisWeek()
+     {
+         $sql = "select 
+                    id as ID, 
+                    dateAdded as `Date`,
+                    type as Type, 
+                    description as Description, 
+                    amount as Amount
+                from transactions 
+                where WEEKOFYEAR(dateAdded) = WEEKOFYEAR(NOW())";
+        return query($sql);
+     }
+
 
     // ** Insert/Update Functions ** //
     // ******************************************************************************************************************* //

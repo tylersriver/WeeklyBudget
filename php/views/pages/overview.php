@@ -1,13 +1,3 @@
-<?php
-
-// Budget Variables
-$remaining = BudgetDB::getRemaining('weekly');
-$spent = BudgetDB::getWeeklySpent();
-$budget = BudgetDB::getBudgetSetting('weekly');
-$budgetMonth = BudgetDB::getBudgetSetting('month');
-
-?>
-
 <div class="container">
     <div class="row">
         <div class="baseContainer col-12">
@@ -23,7 +13,7 @@ $budgetMonth = BudgetDB::getBudgetSetting('month');
                         <tr>
                             <td>Weekly</td>
                             <td>
-                                <div class="progress" style="height: 25px;">
+                                <div class="progress" style="height: 30px;">
                                 <div class="progress-bar budget-progress" style="width: <?php echo ($spent/$budget*100); ?>%;">$<?php echo $spent; ?></div>
                             </div>
                             </td>
@@ -32,7 +22,7 @@ $budgetMonth = BudgetDB::getBudgetSetting('month');
                         <tr>
                             <td>Monthly</td>
                             <td>
-                                <div class="progress" style="height: 25px;">
+                                <div class="progress" style="height: 30px;">
                                 <div class="progress-bar budget-progress bg-success" style="width: <?php echo ($spent/$budgetMonth*100); ?>%;">$<?php echo $spent; ?></div>
                             </div>
                             </td>
@@ -84,6 +74,7 @@ $budgetMonth = BudgetDB::getBudgetSetting('month');
     <div class="row ">
         <div class="baseContainer col-12">
             <h2>Transactions This Week</h2>
+            <?php echo $transactionsTable; ?>
         </div>
     </div>
 </div>
