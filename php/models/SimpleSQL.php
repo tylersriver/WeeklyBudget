@@ -84,7 +84,7 @@ function query($sql, $params = array())
     // Execute SQL
     if($stmt->execute()) {
         if($stmt->affected_rows >= 0 ) {
-            $result = true;
+            $result = $conn->insert_id;
         } else {
             $result = $stmt->get_result();
             if($result != null && $result != false) {
