@@ -22,11 +22,14 @@
                     </div>
                     <div class="col-sm-4">
                         <select name='year' class="form-control" id="year">
-                            <option value='2018'>2018</option>
+                            <?php 
+                            foreach($years as $year) {
+                                echo "<option value = '$year'>$year</option>";
+                            } ?>
                         </select>
                     </div>
                     <div class="col-sm-4">
-                        <button type="submit" class="btn btn-primary">Save</button>
+                        <button type="submit" class="btn btn-primary">View</button>
                     </div>
                 </div>
             </form>

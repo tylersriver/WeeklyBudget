@@ -132,6 +132,21 @@ class BudgetDB extends SimpleORM
          return query($sql);
      }
 
+     /**
+      * Get all years for transaction
+      * @return array
+      */
+     public static function getYearsForTransactions()
+     {
+         $sql = "SELECT YEAR(dateAdded) as year FROM transactions group by YEAR(dateAdded)";
+         $result = query($sql);
+         $returnArray = array();
+         foreach($result as $r) {
+             $returnArray[] = $r['year'];
+         }
+         return $returnArray;
+     }
+
     /**
      * Set a budget value
      * 

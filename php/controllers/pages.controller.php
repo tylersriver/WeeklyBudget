@@ -33,10 +33,13 @@ class PagesController
         // Add Includes used in View
         require_once('php/viewmodels/transactions.viewmodel.php');
         
+        // Transactions table
         $month = ( isset($_POST['month']) ) ? $_POST['month'] : date('n');
         $year = ( isset($_POST['year']) ) ? $_POST['year'] : date('Y');
         $table = TransactionsViewModel::getMonthsTransactionsTable($month, $year);
         $title = "Month Transaction History";
+
+        $years = BudgetDB::getYearsForTransactions();
 
         // Show view
         require_once('php/views/pages/history.php');
