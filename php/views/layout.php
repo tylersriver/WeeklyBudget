@@ -27,7 +27,7 @@
                         Transaction History
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                        <a class="dropdown-item" href="?controller=pages&action=history">This Month</a>
+                        <a class="dropdown-item" href="?controller=pages&action=monthHistory">This Month</a>
                     </div>
                 </li>
             </ul>

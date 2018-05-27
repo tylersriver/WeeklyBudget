@@ -17,4 +17,13 @@ class TransactionsViewModel
         $table->setData($data);
         return $table->display(true);
     }
+
+    public static function getMonthsTransactionsTable($month, $year)
+    {
+        $data = BudgetDB::getTransactionsForMonth($year, $month);
+        $table = new SimpleTable('transactionsTable');
+        $table->setTableClasses(array(BootStrapTableClasses::Hover, BootStrapTableClasses::Small));
+        $table->setData($data);
+        return $table->display(true);        
+    }
 }

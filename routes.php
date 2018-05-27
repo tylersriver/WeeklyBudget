@@ -27,9 +27,18 @@ function call($controller, $action)
 
   // we're adding an entry for the new controller and its actions
   $controllers = array(
-    'pages' => ['overview', 'error', 'budgets', 'history'],
-    'transactions' => ['insert'],
-    'budgets' => ['update']
+    'pages' => [
+      'overview', 
+      'error', 
+      'budgets', 
+      'monthHistory'
+    ],
+    'transactions' => [
+      'insert'
+    ],
+    'budgets' => [
+      'update'
+    ]
   );
 
   // Handling calling the controller

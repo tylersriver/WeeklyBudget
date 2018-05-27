@@ -28,8 +28,15 @@ class PagesController
     /**
      * Show history page
      */
-    public function history()
+    public function monthHistory()
     {
+        // Add Includes used in View
+        require_once('php/viewmodels/transactions.viewmodel.php');
+        
+        $month = ( isset($_POST['month']) ) ? $_POST['month'] : date('n');
+        $year = ( isset($_POST['year']) ) ? $_POST['year'] : date('Y');
+        $table = TransactionsViewModel::getMonthsTransactionsTable($month, $year);
+
         // Show view
         require_once('php/views/pages/history.php');
     }

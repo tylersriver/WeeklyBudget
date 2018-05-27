@@ -11,7 +11,7 @@ class BudgetDB extends SimpleORM
 {
     protected static $table = "transactions";
     protected static $key = "id";
-    protected static $fields = "id, budgetType, amount";
+    protected static $fields = "id, dateAdded, type, description, amount";
 
     /**
      * Get the total sum of transactions for the week
@@ -102,6 +102,26 @@ class BudgetDB extends SimpleORM
                 where WEEKOFYEAR(dateAdded) = WEEKOFYEAR(NOW())";
         return query($sql);
      }
+
+     /**
+      * Retrieves data for each transaction for this week
+      * @param int $year
+      * @param int $month
+      * @return array
+      */
+      public static function getTransactionsForMonth($year, $month)
+      {
+          $sql = "select 
+                     id as ID, 
+                     date_format(dateAdded, '%m/%d/%Y') as `Date`,
+                     type as Type, 
+                     description as Description, 
+                     amount as Amount
+                 from transactions 
+                 where MONTH(dateAdded) = ? 
+                        and YEAR(dateAdded) = ?";
+         return query($sql, [$month, $year]);
+      }
 
      /**
       * Get all current budgets
