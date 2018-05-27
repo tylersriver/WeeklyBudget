@@ -4,7 +4,7 @@
  *
  * Simplifies using MySQLi by maintaining a singleton instance
  * and a simple query function to run paramterized queries.
- * 
+ *
  * Created By: Tyler Sriver
  * @author <tyler.w.sriver@eagles.oc.edu>
  */
@@ -24,7 +24,7 @@ class SimpleSQL
         $this->conn = new mysqli($this->servername, $this->username, $this->password, $this->db);
         if($this->conn->connect_error){
             die("Connection failed: " . $this->conn->connect_error);
-        }    
+        }
     }
 
     public static function getInstance()
@@ -52,9 +52,9 @@ class SimpleSQL
 /**
  * MySQLi bound query function
  *
- * @param $sql string
- * @param $params array
- * @return bool | mysqli_result
+ * @param $sql string - The query to be executed
+ * @param $params array - Array of the parameters for the query
+ * @return bool | array
  */
 function query($sql, $params = array())
 {
@@ -69,7 +69,7 @@ function query($sql, $params = array())
     if(!$stmt) {
         die('SQL Error: ' . $sql);
     }
-    
+
     // Build types array
     $types = buildTypeStringFromArray($params);
 
@@ -88,10 +88,11 @@ function query($sql, $params = array())
         } else {
             $result = $stmt->get_result();
             if($result != null && $result != false) {
-                $data = array(); 
+                $data = array();
                 while($row = $result->fetch_assoc()) {
                     $data[] = $row;
                 }
+                mysqli_free_result($result);
                 return $data;
             }
         }
@@ -100,9 +101,19 @@ function query($sql, $params = array())
     return $result;
 }
 
+
+/***********************************************************************************************************************
+ *
+ *
+ *    Utility Functions
+ *
+ *
+ **********************************************************************************************************************/
+
+
 /**
  * Make array pass by reference
- * 
+ *
  * @param $arr array
  * @return array
  */
@@ -124,7 +135,7 @@ function makeValuesReferenced(&$arr)
  *  integer i
  *  string s
  *
- * @param $parms array
+ * @param $params array
  * @return string
  */
 function buildTypeStringFromArray($params)
@@ -149,3 +160,4 @@ function buildTypeStringFromArray($params)
     }
     return $types;
 }
+
