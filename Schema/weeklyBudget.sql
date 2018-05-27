@@ -5,6 +5,7 @@ Use WeeklyBudget;
 --
 -- Transactions table
 --
+DROP TABLE IF EXISTS Transactions;
 CREATE TABLE Transactions (
     id int(11) AUTO_INCREMENT primary key,
     dateAdded date NOT NULL,
@@ -16,6 +17,7 @@ CREATE TABLE Transactions (
 --
 -- weekMaxValues table
 --
+DROP TABLE IF EXISTS budgets;
 CREATE TABLE budgets (
     id int(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
     budgetType text not null,
@@ -23,3 +25,4 @@ CREATE TABLE budgets (
 );
 
 INSERT INTO budgets (budgetType, amount) values ('weekly', 200);
+INSERT INTO budgets (budgetType, amount) values ('monthly', 800);

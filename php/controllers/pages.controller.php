@@ -11,9 +11,12 @@ class PagesController
         require_once('php/viewmodels/transactions.viewmodel.php');
 
         // Setup View Variables
-        $remaining = BudgetDB::getRemaining('weekly');
-        $spent = BudgetDB::getWeeklySpent();
-        $budget = BudgetDB::getBudgetSetting('weekly');
+        $weeklyRemaining = BudgetDB::getRemaining('weekly');
+        $monthlyRemaining = BudgetDB::getRemaining('monthly');
+        $weeklySpent = BudgetDB::getWeeklySpent();
+        $monthlySpent = BudgetDB::getMonthlySpent();
+        $weeklyBudget = BudgetDB::getBudgetSetting('weekly');
+        $monthlyBudget = BudgetDB::getBudgetSetting('monthly');
 
         // Get Transactions table
         $transactionsTable = TransactionsViewModel::getThisWeeksTransactionsTable();
@@ -25,8 +28,19 @@ class PagesController
     /**
      * Show history page
      */
-    public function history()
+    public function monthHistory()
     {
+        // Add Includes used in View
+        require_once('php/viewmodels/transactions.viewmodel.php');
+        
+        // Transactions table
+        $month = ( isset($_POST['month']) ) ? $_POST['month'] : date('n');
+        $year = ( isset($_POST['year']) ) ? $_POST['year'] : date('Y');
+        $table = TransactionsViewModel::getMonthsTransactionsTable($month, $year);
+        $title = "Month Transaction History";
+
+        $years = BudgetDB::getYearsForTransactions();
+
         // Show view
         require_once('php/views/pages/history.php');
     }

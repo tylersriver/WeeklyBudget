@@ -63,6 +63,10 @@ class SimpleTable
      */
     private function buildColumnHeader()
     {
+        if(count($this->columns) < 1){
+            return "";
+        }
+
         $str = "<th scope='col'>#</th> \n";
         foreach($this->columns as $column) {
             $str .= "<th scope='col'>".$column."</th> \n";
@@ -75,6 +79,10 @@ class SimpleTable
      */
     private function buildTableBody()
     {
+        if(count($this->data) < 1) {
+            return "";
+        }
+
         $str = '';
         foreach($this->data as $i=>$row) {
             $str .= "<tr>                              \n";
@@ -133,6 +141,10 @@ class SimpleTable
      */
     function setData($data)
     {
+        if(count($data) < 1){
+            return;
+        }
+
         $this->data = $data;
 
         // Set columns

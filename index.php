@@ -1,6 +1,9 @@
 <?php
 
 // PHP Includes
+require_once "php/models/SimpleSQL.php";
+require_once "php/models/SimpleORM.php";
+
 require_once('php/models/BudgetDB.php'); 
 require_once('php/lib/SimpleTable.php'); 
 

@@ -4,7 +4,7 @@
     <!-- Bootstrap -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <!-- Main Styles -->
-    <link rel="stylesheet" href="/xampp/WeeklyBudget/styles/global-styles.css">
+    <link rel="stylesheet" href="styles/global-styles.css">
 
   </head>
   <body>
@@ -27,7 +27,7 @@
                         Transaction History
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                        <a class="dropdown-item" href="?controller=pages&action=history">This Month</a>
+                        <a class="dropdown-item" href="?controller=pages&action=monthHistory">This Month</a>
                     </div>
                 </li>
             </ul>
@@ -37,7 +37,7 @@
     <?php require_once('routes.php'); ?>
 
     <footer>
-        <div class="footer"> Copyright Tyler Sriver | 2018 </div
+        <div class="footer"> Copyright Tyler Sriver | 2018 | <a href='https://github.com/tylersriver/WeeklyBudget'>GitHub Repo</a></div>
     </footer>
 
     <!-- JQuery -->
