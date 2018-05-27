@@ -36,6 +36,7 @@ class PagesController
         $month = ( isset($_POST['month']) ) ? $_POST['month'] : date('n');
         $year = ( isset($_POST['year']) ) ? $_POST['year'] : date('Y');
         $table = TransactionsViewModel::getMonthsTransactionsTable($month, $year);
+        $title = "Month Transaction History";
 
         // Show view
         require_once('php/views/pages/history.php');
