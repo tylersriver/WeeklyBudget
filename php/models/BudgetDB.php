@@ -112,7 +112,6 @@ class BudgetDB extends SimpleORM
       public static function getTransactionsForMonth($year, $month)
       {
           $sql = "select 
-                     id as ID, 
                      date_format(dateAdded, '%m/%d/%Y') as `Date`,
                      type as Type, 
                      description as Description, 

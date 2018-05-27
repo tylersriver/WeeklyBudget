@@ -18,6 +18,9 @@ class TransactionsViewModel
         return $table->display(true);
     }
 
+    /**
+     * Build table for the given months transaction
+     */
     public static function getMonthsTransactionsTable($month, $year)
     {
         $data = BudgetDB::getTransactionsForMonth($year, $month);
