@@ -11,9 +11,12 @@ class PagesController
         require_once('php/viewmodels/transactions.viewmodel.php');
 
         // Setup View Variables
-        $remaining = BudgetDB::getRemaining('weekly');
-        $spent = BudgetDB::getWeeklySpent();
-        $budget = BudgetDB::getBudgetSetting('weekly');
+        $weeklyRemaining = BudgetDB::getRemaining('weekly');
+        $monthlyRemaining = BudgetDB::getRemaining('monthly');
+        $weeklySpent = BudgetDB::getWeeklySpent();
+        $monthlySpent = BudgetDB::getMonthlySpent();
+        $weeklyBudget = BudgetDB::getBudgetSetting('weekly');
+        $monthlyBudget = BudgetDB::getBudgetSetting('monthly');
 
         // Get Transactions table
         $transactionsTable = TransactionsViewModel::getThisWeeksTransactionsTable();

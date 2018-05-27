@@ -1,7 +1,5 @@
 <?php
 
-require_once "SimpleSQL.php";
-
 /**
  * Class BudgetDB
  *
@@ -9,11 +7,11 @@ require_once "SimpleSQL.php";
  * bas MySQL Tool to add specific methods
  * used by the WeeklyBudget
  */
-class BudgetDB
+class BudgetDB extends SimpleORM
 {
-    // ** Select Functions ** //
-    // ******************************************************************************************************************* //
-    // ******************************************************************************************************************* //
+    protected static $table = "transactions";
+    protected static $key = "id";
+    protected static $fields = "id, budgetType, amount";
 
     /**
      * Get the total sum of transactions for the week
@@ -29,6 +27,22 @@ class BudgetDB
 
          return $val;
      }
+
+     /**
+      * Get the sum of transactions for the current month
+      *
+      * @return float
+      */
+     public static function getMonthlySpent()
+     {
+         $sql = "SELECT 
+                    sum(amount) as total 
+                from Transactions 
+                where MONTH(dateAdded) = MONTH(now()) 
+                    and YEAR(dateAdded) = YEAR(now())";
+        $result = query($sql);
+        return ($result[0]['total'] == null) ? 0 : $result[0]['total'];
+     }
  
      /**
       * Get the remaining amount for the
@@ -40,7 +54,17 @@ class BudgetDB
       */
      public static function getRemaining($description)
      {
-         $total = BudgetDB::getWeeklySpent();
+        // Get Total spend for budget type
+        switch ($description) {
+            case 'weekly': 
+                $total = BudgetDB::getWeeklySpent();
+                break;
+            case 'monthly':
+                $total = BudgetDB::getMonthlySpent();
+                break;
+            default:
+                $total = 0;
+        }
          
          $sql = 'SELECT amount from budgets where budgetType = ?';
          $result = query($sql, array($description));
@@ -70,7 +94,7 @@ class BudgetDB
      {
          $sql = "select 
                     id as ID, 
-                    date_format(dateAdded, '%d/%m/%Y') as `Date`,
+                    date_format(dateAdded, '%m/%d/%Y') as `Date`,
                     type as Type, 
                     description as Description, 
                     amount as Amount
@@ -85,14 +109,9 @@ class BudgetDB
       */
      public static function getCurrentBudgets()
      {
-         $sql = 'select id as ID, budgetType as Budget, amount as Amount from budgets';
+         $sql = 'select budgetType as Budget, amount as Amount from budgets';
          return query($sql);
      }
-
-
-    // ** Insert/Update Functions ** //
-    // ******************************************************************************************************************* //
-    // ******************************************************************************************************************* //
 
     /**
      * Set a budget value

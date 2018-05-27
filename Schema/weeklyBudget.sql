@@ -25,3 +25,4 @@ CREATE TABLE budgets (
 );
 
 INSERT INTO budgets (budgetType, amount) values ('weekly', 200);
+INSERT INTO budgets (budgetType, amount) values ('monthly', 800);
