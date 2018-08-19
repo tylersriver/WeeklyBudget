@@ -36,6 +36,9 @@
                         <a class="dropdown-item" href="?controller=pages&action=monthHistory">This Month</a>
                     </div>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="?controller=user&action=logout">Logout <span class="sr-only">(current)</span></a>
+                </li>
             </ul>
         </div>
     </nav>

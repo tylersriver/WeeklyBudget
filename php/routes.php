@@ -20,6 +20,9 @@ function call($controller, $action)
       case 'budgets':
         $controller = new BudgetsController();
         break;
+      case 'user':
+        $controller = new UserController();
+        break;
     }
 
     $controller->{ $action }();
@@ -31,13 +34,18 @@ function call($controller, $action)
       'overview', 
       'error', 
       'budgets', 
-      'monthHistory'
+      'monthHistory',
+      'login'
     ],
     'transactions' => [
       'insert'
     ],
     'budgets' => [
       'update'
+    ],
+    'user' => [
+      'login',
+      'logout'
     ]
   );
 

@@ -68,13 +68,16 @@ class SimpleORM
     public static function GetOne($where = array())
     {
         $result = static::GetList($where);
+        if(count($result) < 1) {
+            return array();
+        }
         return $result[0];
     }
 
     /**
      * Inserts a record into the table
      * @param array values - associative array of field => value
-     * @return int - insert id
+     * @return array|bool - The record added
      */
     public static function Add($values = array())
     {
@@ -90,7 +93,7 @@ class SimpleORM
         $i = 0; // Count for iteration
         foreach($values as $key => $val){
             $cols .= "$key";
-
+            
             $vals .= "? ";
             $params[] = $val;
 
@@ -104,7 +107,9 @@ class SimpleORM
         $vals .= ") ";
 
         $sql .= $cols ." VALUES ". $vals;
-        return query($sql, $params);
+        $id = query($sql, $params);
+
+        return static::Get($id);
     }
 
     /**
@@ -129,8 +134,8 @@ class SimpleORM
                 $sql .= ", ";
             }
         }
-        $sql .= " WHERE ".static::$key." = ?";
-        $params[] = $id;
+        $sql .= " WHERE ".static::$key." = ?";   
+        $params[] = $id; 
         return query($sql, $params);
     }
 
@@ -158,19 +163,19 @@ class SimpleORM
         }
         $sql .= " ";
 
-        $sql .= " WHERE ";
+        $sql .= " WHERE ";                                            
         $i = 0;
         foreach($where as $key => $val) {
             $sql .= $key ." = ? ";
             $params[] = $val;
 
-            $i++;
+            $i++;                                                    
             if($i < count($where)) {
                 $sql .= "AND ";
             }
         }
-
-        return query($sql, $params);
+        
+        return query($sql, $params);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
     }
 
     /**

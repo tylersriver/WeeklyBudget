@@ -69,5 +69,12 @@ class PagesController
         require_once('php/views/pages/budgets.php');
     }
 
+    /** 
+     * Show login page
+     */
+    public function login() 
+    {
+        require_once('php/views/pages/login.php');
+    }
 }
 
