@@ -1,9 +1,10 @@
 .baseContainer {
-    margin-top: 15px;
-    margin-bottom: 15px;
+    margin-top: 10px;
+    margin-bottom: 10px;
     border-top: 3px solid #343a40;
     border-radius: 3px;
     box-shadow: 1px 1px 1px 1px grey;
+    padding-bottom: 10px;
 }
 
 .footer {

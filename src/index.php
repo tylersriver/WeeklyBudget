@@ -9,7 +9,6 @@ define("MYSQL_PASSWORD", "ILoveJennifer712");
 define("MYSQL_DB", "WeeklyBudget");
 
 require_once "../vendor/tylersriver/php-simple-sql/src/SimpleSQL.php";
-use SimpleSQL\SQL as SQL;
 require_once "../vendor/tylersriver/php-simple-sql/src/SimpleORM.php";
 
 require_once "models/BudgetDB.php"; 

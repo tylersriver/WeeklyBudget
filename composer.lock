@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/tylersriver/PHPSimpleSQL.git",
-                "reference": "415c36cda6735f2d634484ba0df61ba1d83ffe29"
+                "reference": "6990cbaa1fc3e8de2e7712a993f27094ad299f5d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tylersriver/PHPSimpleSQL/zipball/415c36cda6735f2d634484ba0df61ba1d83ffe29",
-                "reference": "415c36cda6735f2d634484ba0df61ba1d83ffe29",
+                "url": "https://api.github.com/repos/tylersriver/PHPSimpleSQL/zipball/6990cbaa1fc3e8de2e7712a993f27094ad299f5d",
+                "reference": "6990cbaa1fc3e8de2e7712a993f27094ad299f5d",
                 "shasum": ""
             },
             "require": {
@@ -25,7 +25,7 @@
             },
             "type": "library",
             "autoload": {
-                "psr-0": {
+                "psr-4": {
                     "SimpleSQL\\": "src/"
                 }
             },
@@ -34,7 +34,7 @@
                 "MIT"
             ],
             "description": "A simple self managed wrapper for MySQLi in PHP",
-            "time": "2018-09-16T00:02:37+00:00"
+            "time": "2018-09-16T16:15:15+00:00"
         }
     ],
     "packages-dev": [],
