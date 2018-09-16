@@ -1,0 +1,5 @@
+{
+    "require": {
+        "tylersriver/php-simple-sql": "dev-master"
+    }
+}

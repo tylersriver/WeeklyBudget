@@ -1,0 +1,50 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "b8fe170916bdf3eaa15aad25fb16c890",
+    "packages": [
+        {
+            "name": "tylersriver/php-simple-sql",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tylersriver/PHPSimpleSQL.git",
+                "reference": "415c36cda6735f2d634484ba0df61ba1d83ffe29"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/tylersriver/PHPSimpleSQL/zipball/415c36cda6735f2d634484ba0df61ba1d83ffe29",
+                "reference": "415c36cda6735f2d634484ba0df61ba1d83ffe29",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "SimpleSQL\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "A simple self managed wrapper for MySQLi in PHP",
+            "time": "2018-09-16T00:02:37+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": {
+        "tylersriver/php-simple-sql": 20
+    },
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": []
+}
