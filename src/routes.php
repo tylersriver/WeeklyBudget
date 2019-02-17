@@ -8,8 +8,6 @@
  */
 function call($controller, $action)
 {
-    require_once('controllers/' . $controller . '.controller.php');
-
     switch($controller) {
       case 'pages':
         $controller = new PagesController();

@@ -12,21 +12,24 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/tylersriver/PHPSimpleSQL.git",
-                "reference": "6990cbaa1fc3e8de2e7712a993f27094ad299f5d"
+                "reference": "a1b1cc06b67adb793b0bee0e910e6014740d908c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tylersriver/PHPSimpleSQL/zipball/6990cbaa1fc3e8de2e7712a993f27094ad299f5d",
-                "reference": "6990cbaa1fc3e8de2e7712a993f27094ad299f5d",
+                "url": "https://api.github.com/repos/tylersriver/PHPSimpleSQL/zipball/a1b1cc06b67adb793b0bee0e910e6014740d908c",
+                "reference": "a1b1cc06b67adb793b0bee0e910e6014740d908c",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.0"
+                "php": "^7.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^8.0"
             },
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "SimpleSQL\\": "src/"
+                    "SimpleSQL\\": "src/SimpleSQL"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -34,7 +37,7 @@
                 "MIT"
             ],
             "description": "A simple self managed wrapper for MySQLi in PHP",
-            "time": "2018-09-16T16:15:15+00:00"
+            "time": "2019-02-17T18:39:31+00:00"
         }
     ],
     "packages-dev": [],

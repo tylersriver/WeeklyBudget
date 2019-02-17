@@ -3,6 +3,7 @@
 /**
  * Constructs a Bootstrap table with set properties
  */
+
 class SimpleTable
 {
     private $tableId;                   // Used as DOM Id
@@ -17,6 +18,8 @@ class SimpleTable
         $this->tableId = $tableId;
         $this->tableClasses = array();
         $this->theadColor = '';
+        $this->data = [];
+        $this->columns = [];
     }
     
     function display($return = false)
@@ -141,11 +144,9 @@ class SimpleTable
      */
     function setData($data)
     {
-        if(count($data) < 1){
-            return;
-        }
+        if(!count($data)) return;
 
-        $this->data = $data;
+        $this->data = (array)$data;
 
         // Set columns
         $this->columns = array();

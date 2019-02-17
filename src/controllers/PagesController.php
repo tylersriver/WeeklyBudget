@@ -1,5 +1,4 @@
 <?php
-
 class PagesController 
 {
     /**
@@ -7,9 +6,6 @@ class PagesController
      */
     public function overview() 
     {
-        // Add Includes used in View
-        require_once('viewmodels/transactions.viewmodel.php');
-
         // Setup View Variables
         $weeklyRemaining = BudgetDB::getRemaining('weekly');
         $monthlyRemaining = BudgetDB::getRemaining('monthly');
@@ -22,7 +18,7 @@ class PagesController
         $transactionsTable = TransactionsViewModel::getThisWeeksTransactionsTable();
 
         // Show view
-        require_once('views/pages/overview.php');
+        call('pages', 'overview');
     }
 
     /**
@@ -42,7 +38,7 @@ class PagesController
         $years = BudgetDB::getYearsForTransactions();
 
         // Show view
-        require_once('views/pages/history.php');
+        call('pages', 'history');
     }
 
     /** 
@@ -50,7 +46,7 @@ class PagesController
      */
     public function error() 
     {
-        require_once('views/pages/error.php');
+        call('pages', 'error');
     }
 
     /**
@@ -66,7 +62,7 @@ class PagesController
         $budgetTable = $budgetTable->display(true);
 
         // Show view
-        require_once('views/pages/budgets.php');
+        call('pages', 'budgets');
     }
 
     /** 
@@ -74,7 +70,7 @@ class PagesController
      */
     public function login() 
     {
-        require_once('views/pages/login.php');
+        call('pages', 'login');
     }
 }
 

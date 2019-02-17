@@ -8,12 +8,25 @@ define("MYSQL_USER", "dev_user");
 define("MYSQL_PASSWORD", "ILoveJennifer712");
 define("MYSQL_DB", "WeeklyBudget");
 
-require_once "../vendor/tylersriver/php-simple-sql/src/SimpleSQL.php";
-require_once "../vendor/tylersriver/php-simple-sql/src/SimpleORM.php";
+require_once __DIR__ . '/lib/vendor/autoload.php';
 
-require_once "models/BudgetDB.php"; 
-require_once "models/User.php"; 
-require_once "lib/SimpleTable.php"; 
+// Register Autoload for classes
+spl_autoload_register(function($class) {
+    $directories = [
+        'lib/' => '.php',
+        'models/' => '.php',
+        'viewmodels/' => '.php',
+        'controllers/' => '.php'
+    ];
+
+    foreach($directories as $directory => $fileAppend) {
+        $filePath = __DIR__ . '/' . $directory . $class . $fileAppend;
+        if(file_exists($filePath)) {
+            require $filePath;
+            return;
+        }
+    }
+});
 
 // Handle Routing
 // ---------------------------------------------------------------------

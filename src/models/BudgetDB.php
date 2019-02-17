@@ -7,8 +7,9 @@
  * bas MySQL Tool to add specific methods
  * used by the WeeklyBudget
  */
-use SimpleSQL\SQL as SQL;
-class BudgetDB extends SimpleSQL\ORM
+use SimpleSQL\ORM as ORM;
+
+ class BudgetDB extends ORM
 {
     protected static $table = "transactions";
     protected static $key = "id";
@@ -22,7 +23,7 @@ class BudgetDB extends SimpleSQL\ORM
      public static function getWeeklySpent()
      {   
          $sql = "SELECT sum(amount) as total from Transactions where WEEKOFYEAR(dateAdded) = WEEKOFYEAR(NOW())";
-         $result = SQL::query($sql);
+         $result = self::query($sql);
 
         $val = ($result[0]['total'] == null) ? 0 : $result[0]['total'];
 
@@ -41,7 +42,7 @@ class BudgetDB extends SimpleSQL\ORM
                 from Transactions 
                 where MONTH(dateAdded) = MONTH(now()) 
                     and YEAR(dateAdded) = YEAR(now())";
-        $result = SQL::query($sql);
+        $result = self::query($sql);
         return ($result[0]['total'] == null) ? 0 : $result[0]['total'];
      }
  
@@ -68,7 +69,7 @@ class BudgetDB extends SimpleSQL\ORM
         }
          
          $sql = 'SELECT amount from budgets where budgetType = ?';
-         $result = SQL::query($sql, array($description));
+         $result = self::query($sql, array($description));
          $budget = $result[0]['amount'];
  
          return $budget - $total;
@@ -83,7 +84,7 @@ class BudgetDB extends SimpleSQL\ORM
      public static function getBudgetSetting($type)
      {
          $sql = "SELECT amount from budgets where budgetType = ?";
-         $result = SQL::query($sql, array($type));
+         $result = self::query($sql, array($type));
          return $result[0]['amount'];
      }
 
@@ -101,7 +102,7 @@ class BudgetDB extends SimpleSQL\ORM
                     amount as Amount
                 from transactions 
                 where WEEKOFYEAR(dateAdded) = WEEKOFYEAR(NOW())";
-        return SQL::query($sql);
+        return self::query($sql);
      }
 
      /**
@@ -120,7 +121,7 @@ class BudgetDB extends SimpleSQL\ORM
                  from transactions 
                  where MONTH(dateAdded) = ? 
                         and YEAR(dateAdded) = ?";
-         return SQL::query($sql, [$month, $year]);
+         return self::query($sql, [$month, $year]);
       }
 
      /**
@@ -130,7 +131,7 @@ class BudgetDB extends SimpleSQL\ORM
      public static function getCurrentBudgets()
      {
          $sql = 'select budgetType as Budget, amount as Amount from budgets';
-         return SQL::query($sql);
+         return self::query($sql);
      }
 
      /**
@@ -158,7 +159,7 @@ class BudgetDB extends SimpleSQL\ORM
     {
         $sql = "Update budgets set amount = ? where budgetType = ?";
         $params = array($amount, $budgetType);
-        SQL::query($sql, $params);
+        self::query($sql, $params);
     }
 
     /**
@@ -172,6 +173,6 @@ class BudgetDB extends SimpleSQL\ORM
     public static function insertTransaction($type, $description, $amount, $date)
     {
         $sql = 'INSERT INTO transactions (type, description, amount, dateAdded) values (?,?,?,?)';
-        SQL::query($sql, array($type, $description, $amount, $date));
+        self::query($sql, array($type, $description, $amount, $date));
     }
 }

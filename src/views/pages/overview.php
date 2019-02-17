@@ -14,19 +14,19 @@
                             <td>This Week</td>
                             <td>
                                 <div class="progress" style="height: 30px;">
-                                <div class="progress-bar budget-progress" style="width: <?php echo ($weeklySpent/$weeklyBudget*100); ?>%;">$<?php echo $weeklySpent; ?></div>
+                                <div class="progress-bar budget-progress" style="width: <?= ($weeklySpent/$weeklyBudget*100); ?>%;">$<?= $weeklySpent; ?></div>
                             </div>
                             </td>
-                            <td>$<?php echo $weeklyRemaining; ?> of $<?php echo $weeklyBudget ?></td>
+                            <td>$<?= $weeklyRemaining; ?> of $<?= $weeklyBudget ?></td>
                         </tr>
                         <tr>
                             <td>Monthly</td>
                             <td>
                                 <div class="progress" style="height: 30px;">
-                                <div class="progress-bar budget-progress bg-success" style="width: <?php echo ($monthlySpent/($monthlyBudget)*100); ?>%;">$<?php echo $monthlySpent; ?></div>
+                                <div class="progress-bar budget-progress bg-success" style="width: <?= ($monthlySpent/($monthlyBudget)*100); ?>%;">$<?= $monthlySpent; ?></div>
                             </div>
                             </td>
-                            <td>$<?php echo $monthlyRemaining ?> of $<?php echo $monthlyBudget ?></td>
+                            <td>$<?= $monthlyRemaining ?> of $<?= $monthlyBudget ?></td>
                         </tr>
                     </tbody>
                 </table>
@@ -36,7 +36,7 @@
     <div class="row ">
         <div class="baseContainer col-12">
             <h2>Transactions This Week</h2>
-            <?php echo $transactionsTable; ?>
+            <?= $transactionsTable; ?>
         </div>
     </div>
     <div class="row">
