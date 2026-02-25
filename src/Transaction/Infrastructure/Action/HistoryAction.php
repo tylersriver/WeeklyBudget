@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Action;
+namespace App\Transaction\Infrastructure\Action;
 
-use App\Repository\TransactionRepository;
+use App\Transaction\Application\Query\GetMonthlyTransactionsQuery;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Views\Twig;
@@ -13,7 +13,7 @@ final class HistoryAction
 {
     public function __construct(
         private readonly Twig $view,
-        private readonly TransactionRepository $transactions,
+        private readonly GetMonthlyTransactionsQuery $getMonthlyTransactions,
     ) {}
 
     public function index(Request $request, Response $response): Response
@@ -35,11 +35,8 @@ final class HistoryAction
 
     private function renderHistory(Response $response, int $month, int $year): Response
     {
-        return $this->view->render($response, 'history.html.twig', [
-            'transactions'  => $this->transactions->getTransactionsForMonth($year, $month),
-            'years'         => $this->transactions->getYearsForTransactions(),
-            'selectedMonth' => $month,
-            'selectedYear'  => $year,
-        ]);
+        $data = ($this->getMonthlyTransactions)($month, $year);
+
+        return $this->view->render($response, 'history.html.twig', $data);
     }
 }

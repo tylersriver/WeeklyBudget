@@ -47,8 +47,9 @@ $builder->addDefinitions([
         ]));
     },
 
-    App\Repository\TransactionRepository::class => DI\autowire(),
-    App\Repository\BudgetRepository::class       => DI\autowire(),
+    // Domain → Infrastructure bindings (Ports → Adapters)
+    App\Budget\Domain\BudgetRepositoryInterface::class           => DI\autowire(App\Budget\Infrastructure\CycleBudgetRepository::class),
+    App\Transaction\Domain\TransactionRepositoryInterface::class => DI\autowire(App\Transaction\Infrastructure\CycleTransactionRepository::class),
 ]);
 
 return $builder->build();

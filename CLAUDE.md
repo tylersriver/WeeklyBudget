@@ -9,8 +9,8 @@ WeeklyBudget is a PHP web application for tracking personal weekly and monthly b
 - **Language**: PHP 8.5+ (strict types, pipe operator, readonly classes, `#[\NoDiscard]`, enums, constructor promotion)
 - **Framework**: Slim 4 (PSR-7 / PSR-15 micro-framework)
 - **Runtime**: FrankenPHP (worker mode for persistent-process performance)
-- **ORM**: Cycle ORM v2 (annotated entities, DataMapper pattern)
-- **Database**: MySQL 8 via Cycle DBAL
+- **Architecture**: Domain-Driven Design (DDD) with CQRS at the service layer
+- **Database**: MySQL 8 via Cycle DBAL (raw SQL, parameterized queries)
 - **Templating**: Twig 3 via `slim/twig-view`
 - **DI Container**: PHP-DI 7 (PSR-11, autowiring enabled)
 - **Frontend**: Tailwind CSS v4 + DaisyUI 5 (CDN), Alpine.js 3, Chart.js 4
@@ -22,54 +22,116 @@ WeeklyBudget is a PHP web application for tracking personal weekly and monthly b
 ```
 WeeklyBudget/
 ├── public/
-│   └── index.php                    # Front controller + FrankenPHP worker loop
+│   └── index.php                                  # Front controller + FrankenPHP worker loop
 ├── config/
-│   ├── container.php                # PHP-DI service definitions
-│   ├── routes.php                   # Slim route registration
-│   ├── middleware.php               # Middleware stack (body parsing, routing, Twig, errors)
-│   └── settings.php                 # App settings (reads .env)
+│   ├── container.php                              # PHP-DI service definitions (port → adapter bindings)
+│   ├── routes.php                                 # Slim route registration
+│   ├── middleware.php                             # Middleware stack
+│   └── settings.php                               # App settings (reads .env)
 ├── src/
-│   ├── Action/                      # Route handlers (thin controllers)
-│   │   ├── DashboardAction.php      # GET /
-│   │   ├── HistoryAction.php        # GET|POST /history
-│   │   ├── BudgetAction.php         # GET|POST /budgets
-│   │   └── TransactionAction.php    # POST /transactions
-│   ├── Entity/                      # Cycle ORM entities
-│   │   ├── Transaction.php
-│   │   └── Budget.php
-│   ├── Repository/                  # Query logic
-│   │   ├── TransactionRepository.php
-│   │   └── BudgetRepository.php
-│   └── Enum/
-│       ├── TransactionType.php      # Food, Groceries, Gas, Shopping, Other
-│       └── BudgetType.php           # Weekly, Monthly
+│   ├── Shared/
+│   │   └── Domain/
+│   │       └── AggregateRoot.php                  # Abstract base — identity + equality
+│   ├── Budget/
+│   │   ├── Domain/
+│   │   │   ├── Budget.php                         # Aggregate Root — invariants, remaining(), percentUsed()
+│   │   │   ├── BudgetType.php                     # Value Object (backed enum)
+│   │   │   ├── MoneyAmount.php                    # Value Object — wraps decimal amounts
+│   │   │   └── BudgetRepositoryInterface.php      # Port (persistence contract)
+│   │   ├── Application/
+│   │   │   ├── Command/
+│   │   │   │   ├── UpdateBudgetCommand.php        # Command DTO
+│   │   │   │   └── UpdateBudgetHandler.php        # Command handler
+│   │   │   └── Query/
+│   │   │       ├── GetAllBudgetsQuery.php         # Query handler
+│   │   │       └── GetBudgetByTypeQuery.php       # Query handler
+│   │   └── Infrastructure/
+│   │       ├── CycleBudgetRepository.php          # Adapter — raw SQL via Cycle DBAL
+│   │       └── Action/
+│   │           └── BudgetAction.php               # HTTP adapter (GET|POST /budgets)
+│   ├── Transaction/
+│   │   ├── Domain/
+│   │   │   ├── Transaction.php                    # Aggregate Root — record() factory + invariants
+│   │   │   ├── TransactionType.php                # Value Object (backed enum)
+│   │   │   ├── TransactionDescription.php         # Value Object — validates non-empty string
+│   │   │   └── TransactionRepositoryInterface.php # Port
+│   │   ├── Application/
+│   │   │   ├── Command/
+│   │   │   │   ├── RecordTransactionCommand.php   # Command DTO
+│   │   │   │   └── RecordTransactionHandler.php   # Command handler
+│   │   │   └── Query/
+│   │   │       ├── GetWeeklyTransactionsQuery.php # Query handler
+│   │   │       └── GetMonthlyTransactionsQuery.php# Query handler
+│   │   └── Infrastructure/
+│   │       ├── CycleTransactionRepository.php     # Adapter — raw SQL via Cycle DBAL
+│   │       └── Action/
+│   │           ├── TransactionAction.php          # HTTP adapter (POST /transactions)
+│   │           └── HistoryAction.php              # HTTP adapter (GET|POST /history)
+│   └── Reporting/
+│       ├── Domain/
+│       │   └── SpendingSummary.php                # Value Object — budget vs spent snapshot
+│       ├── Application/
+│       │   └── Query/
+│       │       ├── DashboardData.php              # Readonly DTO with toTemplateVars()
+│       │       └── GetDashboardQuery.php          # Cross-context query handler
+│       └── Infrastructure/
+│           └── Action/
+│               └── DashboardAction.php            # HTTP adapter (GET /)
 ├── templates/
-│   ├── layout.html.twig             # Base layout (navbar, dark mode, CDN scripts)
-│   ├── dashboard.html.twig          # Budget cards, chart, transaction form, weekly table
-│   ├── history.html.twig            # Month/year filter + transaction table
-│   └── budgets.html.twig            # Budget table + update form
+│   ├── layout.html.twig                           # Base layout (navbar, dark mode, CDN scripts)
+│   ├── dashboard.html.twig                        # Budget cards, chart, transaction form, weekly table
+│   ├── history.html.twig                          # Month/year filter + transaction table
+│   └── budgets.html.twig                          # Budget table + update form
 ├── resources/
-│   └── input.css                    # Tailwind source (for standalone CLI builds)
+│   └── input.css                                  # Tailwind source (for standalone CLI builds)
 ├── Schema/
-│   └── weeklyBudget.sql             # MySQL schema + seed data
+│   └── weeklyBudget.sql                           # MySQL schema + seed data
 ├── var/
-│   ├── cache/                       # Twig compiled templates (production)
+│   ├── cache/                                     # Twig compiled templates (production)
 │   └── log/
-├── .env.example                     # Environment template
+├── .env.example                                   # Environment template
 ├── composer.json
-├── tailwind.config.js               # Tailwind / DaisyUI config
-├── Dockerfile                       # FrankenPHP production image
-├── docker-compose.yml               # App + MySQL services
+├── tailwind.config.js                             # Tailwind / DaisyUI config
+├── Dockerfile                                     # FrankenPHP production image
+├── docker-compose.yml                             # App + MySQL services
 └── CLAUDE.md
 ```
 
 ## Architecture & Request Flow
 
-1. `public/index.php` — loads `.env`, builds DI container, creates Slim app, registers middleware + routes
-2. In FrankenPHP worker mode, the app boots **once** then handles requests in a `frankenphp_handle_request()` loop
-3. Slim routes dispatch to Action classes (invokable or method-based)
-4. Actions inject repositories via constructor (PHP-DI autowiring) and render Twig templates
-5. Repositories use `Cycle\Database\DatabaseManager` for raw SQL queries against MySQL
+### DDD Layering
+
+Each bounded context (`Budget/`, `Transaction/`, `Reporting/`) follows three layers:
+
+1. **Domain** — Aggregate Roots, Value Objects, repository interfaces (ports). Zero framework dependencies.
+2. **Application** — CQRS Command/Query handlers. Orchestrate domain objects. No HTTP or DB knowledge.
+3. **Infrastructure** — Adapters: Cycle DBAL repositories, Slim HTTP actions. Implement ports.
+
+### Request Flow
+
+1. `public/index.php` — boots container (once in worker mode), creates Slim app
+2. Slim routes dispatch to **Infrastructure Actions** (HTTP adapters)
+3. Actions create **Command DTOs** or invoke **Query handlers**
+4. **Command handlers** build Aggregate Roots via domain factories, call repository ports
+5. **Query handlers** call repository ports, assemble DTOs
+6. **Infrastructure repositories** (adapters) execute raw SQL via Cycle DBAL
+7. Actions render Twig templates with query results
+
+### CQRS Pattern
+
+**Commands** (write side): `RecordTransactionCommand` → `RecordTransactionHandler`, `UpdateBudgetCommand` → `UpdateBudgetHandler`
+
+**Queries** (read side): `GetDashboardQuery`, `GetAllBudgetsQuery`, `GetBudgetByTypeQuery`, `GetWeeklyTransactionsQuery`, `GetMonthlyTransactionsQuery`
+
+Command DTOs are `readonly class`es. Handlers are `__invoke()`-able. No message bus — handlers are injected directly.
+
+### Bounded Contexts
+
+| Context | Responsibility | Aggregates | Value Objects |
+|---------|----------------|------------|---------------|
+| **Budget** | Budget limits and spending calculations | `Budget` | `BudgetType`, `MoneyAmount` |
+| **Transaction** | Recording and querying expenses | `Transaction` | `TransactionType`, `TransactionDescription` |
+| **Reporting** | Cross-context dashboard assembly | — | `SpendingSummary` |
 
 ### Routes
 
@@ -82,23 +144,33 @@ WeeklyBudget/
 | POST   | `/budgets`      | `BudgetAction::update`        | `budgets.update`    |
 | POST   | `/transactions` | `TransactionAction::__invoke` | `transactions.store`|
 
-## Key Components
+## Key Domain Components
 
-### Entities (`src/Entity/`)
-`readonly` classes with Cycle ORM `#[Entity]` and `#[Column]` attributes. Map directly to the existing `transactions` and `budgets` MySQL tables.
+### Aggregate Roots
 
-### Repositories (`src/Repository/`)
-- **TransactionRepository** — `getWeeklySpent()`, `getMonthlySpent()`, `getTransactionsThisWeek()`, `getTransactionsForMonth()`, `getYearsForTransactions()`, `getMonthlySpendingByCategory()`, `insert()`
-- **BudgetRepository** — `getBudgetSetting()`, `getAll()`, `update()`
+**Budget** (`Budget/Domain/Budget.php`):
+- Private constructor; created via `Budget::create()` or `Budget::reconstitute()`
+- `updateAmount(MoneyAmount)` — returns new instance (immutable)
+- `remaining(MoneyAmount $spent)` — domain calculation
+- `percentUsed(MoneyAmount $spent)` — domain calculation
+- Invariant: amount must be positive
 
-Both inject `DatabaseManager` and use raw SQL via `$this->dbal->database()->query(...)`.
+**Transaction** (`Transaction/Domain/Transaction.php`):
+- Factory: `Transaction::record(TransactionType, TransactionDescription, MoneyAmount, DateTimeImmutable)`
+- Invariants: non-empty description, positive amount, valid type
 
-### Enums (`src/Enum/`)
-- `TransactionType` — backed string enum: Food, Groceries, Gas, Shopping, Other
-- `BudgetType` — backed string enum: weekly, monthly
+### Value Objects
 
-### Actions (`src/Action/`)
-Thin controllers that inject `Twig` + repositories. Return `$this->view->render(...)` responses. `TransactionAction` does a POST-redirect-GET to the dashboard.
+- **MoneyAmount** — wraps decimal string; `fromString()`, `fromFloat()`, `zero()`, `subtract()`, `isPositive()`, `toFloat()`, `toString()`
+- **TransactionDescription** — wraps non-empty trimmed string; `fromString()`, `toString()`
+- **SpendingSummary** — readonly snapshot: `remaining()`, `percentUsed()`
+- **BudgetType** / **TransactionType** — backed string enums
+
+### Repository Interfaces (Ports)
+
+**BudgetRepositoryInterface**: `findByType()`, `findAll()`, `save()`
+
+**TransactionRepositoryInterface**: `save()`, `weeklySpent()`, `monthlySpent()`, `transactionsThisWeek()`, `transactionsForMonth()`, `yearsWithTransactions()`, `monthlySpendingByCategory()`
 
 ## Database Schema
 
@@ -113,15 +185,18 @@ Schema file: `Schema/weeklyBudget.sql`
 ## Code Conventions
 
 - **Strict types** declared in every PHP file
-- **PSR-4** namespacing: `App\Action`, `App\Entity`, `App\Repository`, `App\Enum`
-- **Class names**: PascalCase (`DashboardAction`, `TransactionRepository`)
-- **Methods**: camelCase (`getWeeklySpent`, `insert`)
+- **DDD namespacing**: `App\{Context}\{Layer}\{Class}` (e.g., `App\Budget\Domain\Budget`)
+- **Class names**: PascalCase (`Budget`, `RecordTransactionHandler`)
+- **Methods**: camelCase (`weeklySpent`, `toFloat`)
 - **Constructor promotion** with `readonly` for dependency injection
 - **Backed enums** for type-safe domain values
-- **Pipe operator (`|>`)** for data transformation chains in repositories
-- **`#[\NoDiscard]`** on repository read methods to prevent silent discard
-- **`readonly` entities** — immutable data objects
-- **PHPDoc blocks** on all public repository methods
+- **Pipe operator (`|>`)** for data transformation chains in infrastructure repositories
+- **`#[\NoDiscard]`** on query methods and domain calculations to prevent silent discard
+- **`readonly` Value Objects** — immutable, equality by value
+- **Aggregate Roots** — private constructors, named factory methods, invariant enforcement
+- **Command DTOs** — `readonly class` with public properties
+- **Query handlers** — `__invoke()`-able, return DTOs or arrays
+- **PHPDoc blocks** on all public methods
 - **Twig templates**: `*.html.twig` with DaisyUI component classes
 - **No `echo`/`print`** — all output via Twig rendering
 
@@ -173,12 +248,14 @@ No linter, formatter, or pre-commit hooks are configured.
 - **Dependencies managed via Composer** — run `composer install` after cloning. No npm required (frontend is CDN).
 - **Database credentials** are in `.env` (git-ignored). Never commit `.env`. Use `.env.example` as template.
 - **PSR-4 autoloading** — no `require_once` needed. Add new classes under `src/` with correct namespace.
-- **Adding routes** — register in `config/routes.php`, create corresponding Action class in `src/Action/`.
+- **Adding a new feature** — identify the bounded context, add domain objects first, then application handlers, then infrastructure (repository adapter + HTTP action). Register routes in `config/routes.php`.
+- **Adding a new bounded context** — create `src/{Context}/Domain/`, `Application/Command/`, `Application/Query/`, `Infrastructure/Action/`. Bind repository interfaces in `config/container.php`.
+- **Repository interfaces live in Domain** — implementations in Infrastructure. DI container binds port → adapter.
 - **Twig auto-escapes** HTML by default — safer than raw PHP views. Use `|raw` only for trusted content.
-- **Repositories use raw SQL** via Cycle DBAL (not the Cycle ORM query builder) for compatibility with the existing schema. Queries are parameterized.
-- **FrankenPHP worker mode** — the app boots once. All services (repositories, actions) are stateless singletons safe for reuse across requests. Avoid storing request-scoped state in static properties or global variables.
+- **Repositories use raw SQL** via Cycle DBAL (not the Cycle ORM query builder). Queries are parameterized.
+- **FrankenPHP worker mode** — the app boots once. All services (repositories, handlers, actions) are stateless singletons safe for reuse across requests. Avoid storing request-scoped state in static properties or global variables.
 - **Worker-mode DB reconnect** — the worker loop pings MySQL before each request and reconnects on failure (guards against idle timeout drops). The MySQL driver is configured with `reconnect: true`.
 - **No ORM identity map** — repositories use raw DBAL queries, not the Cycle ORM entity manager. This avoids heap accumulation across worker requests.
 - **DaisyUI components** — use DaisyUI class names (`card`, `table`, `btn`, `badge`, etc.) in templates. Refer to https://daisyui.com/components/.
 - **Alpine.js** — used for client-side interactivity (chart init, toast auto-dismiss). Directives like `x-data`, `x-init`, `x-show` are in Twig templates.
-- **PHP 8.5 features** — use pipe operator (`|>`) for chained data transforms, `#[\NoDiscard]` for methods whose results must be consumed, `readonly` classes for immutable entities, and `static` closures in DI definitions for worker safety.
+- **PHP 8.5 features** — use pipe operator (`|>`) for chained data transforms, `#[\NoDiscard]` for methods whose results must be consumed, `readonly` classes for immutable value objects and entities, and `static` closures in DI definitions for worker safety.

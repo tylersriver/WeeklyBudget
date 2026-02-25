@@ -2,21 +2,34 @@
 
 declare(strict_types=1);
 
-namespace App\Repository;
+namespace App\Transaction\Infrastructure;
 
+use App\Budget\Domain\MoneyAmount;
+use App\Transaction\Domain\Transaction;
+use App\Transaction\Domain\TransactionRepositoryInterface;
 use Cycle\Database\DatabaseManager;
 
-class TransactionRepository
+final class CycleTransactionRepository implements TransactionRepositoryInterface
 {
     public function __construct(
         private readonly DatabaseManager $dbal,
     ) {}
 
-    /**
-     * Sum of transaction amounts for the current week.
-     */
-    #[\NoDiscard('Weekly spent total should be used')]
-    public function getWeeklySpent(): float
+    public function save(Transaction $transaction): void
+    {
+        $this->dbal->database()
+            ->insert('transactions')
+            ->values([
+                'type'        => $transaction->getType()->value,
+                'description' => $transaction->getDescription()->toString(),
+                'amount'      => $transaction->getAmount()->toString(),
+                'dateAdded'   => $transaction->getDateAdded()->format('Y-m-d'),
+            ])
+            ->run();
+    }
+
+    #[\NoDiscard]
+    public function weeklySpent(): MoneyAmount
     {
         return $this->dbal->database()
             ->query(
@@ -26,14 +39,11 @@ class TransactionRepository
                    AND YEAR(dateAdded) = YEAR(NOW())'
             )
             ->fetch()
-            |> (static fn(array $row): float => (float) $row['total']);
+            |> (static fn(array $row): MoneyAmount => MoneyAmount::fromFloat((float) $row['total']));
     }
 
-    /**
-     * Sum of transaction amounts for the current month.
-     */
-    #[\NoDiscard('Monthly spent total should be used')]
-    public function getMonthlySpent(): float
+    #[\NoDiscard]
+    public function monthlySpent(): MoneyAmount
     {
         return $this->dbal->database()
             ->query(
@@ -43,16 +53,11 @@ class TransactionRepository
                    AND YEAR(dateAdded) = YEAR(NOW())'
             )
             ->fetch()
-            |> (static fn(array $row): float => (float) $row['total']);
+            |> (static fn(array $row): MoneyAmount => MoneyAmount::fromFloat((float) $row['total']));
     }
 
-    /**
-     * All transactions for the current week.
-     *
-     * @return array<int, array<string, mixed>>
-     */
     #[\NoDiscard]
-    public function getTransactionsThisWeek(): array
+    public function transactionsThisWeek(): array
     {
         return $this->dbal->database()
             ->query(
@@ -66,13 +71,8 @@ class TransactionRepository
             ->fetchAll();
     }
 
-    /**
-     * All transactions for a given month/year.
-     *
-     * @return array<int, array<string, mixed>>
-     */
     #[\NoDiscard]
-    public function getTransactionsForMonth(int $year, int $month): array
+    public function transactionsForMonth(int $year, int $month): array
     {
         return $this->dbal->database()
             ->query(
@@ -86,13 +86,8 @@ class TransactionRepository
             ->fetchAll();
     }
 
-    /**
-     * Distinct years that have transactions.
-     *
-     * @return int[]
-     */
     #[\NoDiscard]
-    public function getYearsForTransactions(): array
+    public function yearsWithTransactions(): array
     {
         return $this->dbal->database()
             ->query(
@@ -108,13 +103,8 @@ class TransactionRepository
             ));
     }
 
-    /**
-     * Spending totals grouped by transaction type for the current month.
-     *
-     * @return array<string, float>
-     */
     #[\NoDiscard]
-    public function getMonthlySpendingByCategory(): array
+    public function monthlySpendingByCategory(): array
     {
         return $this->dbal->database()
             ->query(
@@ -133,21 +123,5 @@ class TransactionRepository
                 'total',
                 'type',
             ));
-    }
-
-    /**
-     * Insert a new transaction.
-     */
-    public function insert(string $type, string $description, string $amount, string $date): void
-    {
-        $this->dbal->database()
-            ->insert('transactions')
-            ->values([
-                'type'        => $type,
-                'description' => $description,
-                'amount'      => $amount,
-                'dateAdded'   => $date,
-            ])
-            ->run();
     }
 }

@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 use Slim\App;
-use App\Action\DashboardAction;
-use App\Action\HistoryAction;
-use App\Action\BudgetAction;
-use App\Action\TransactionAction;
+use App\Reporting\Infrastructure\Action\DashboardAction;
+use App\Transaction\Infrastructure\Action\HistoryAction;
+use App\Budget\Infrastructure\Action\BudgetAction;
+use App\Transaction\Infrastructure\Action\TransactionAction;
 
 return function (App $app): void {
     // Dashboard
