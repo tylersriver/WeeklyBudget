@@ -5,12 +5,15 @@ services:
       - "8080:80"
     env_file: .env
     environment:
+      SERVER_NAME: ":80"
       FRANKENPHP_CONFIG: "worker ./public/index.php"
     volumes:
       - .:/app
+      - /app/vendor
     depends_on:
       mysql:
         condition: service_healthy
+    tty: true
 
   mysql:
     image: mysql:8.0
