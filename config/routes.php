@@ -19,6 +19,11 @@ return function (App $app): void {
     // Budgets
     $app->get('/budgets', [BudgetAction::class, 'index'])->setName('budgets');
     $app->post('/budgets', [BudgetAction::class, 'update'])->setName('budgets.update');
+    $app->post('/budgets/activate', [BudgetAction::class, 'activate'])->setName('budgets.activate');
+
+    // Categories
+    $app->post('/categories', [BudgetAction::class, 'addCategory'])->setName('categories.store');
+    $app->post('/categories/delete', [BudgetAction::class, 'deleteCategory'])->setName('categories.delete');
 
     // Transactions
     $app->post('/transactions', TransactionAction::class)->setName('transactions.store');

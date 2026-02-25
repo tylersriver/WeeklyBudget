@@ -5,43 +5,24 @@
 {% block content %}
 <div class="space-y-6">
 
-    {# ── Budget summary cards ── #}
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {# Weekly #}
-        <div class="card bg-base-100 shadow-xl">
-            <div class="card-body">
-                <h2 class="card-title">Weekly Budget</h2>
-                <p class="text-3xl font-bold">${{ weeklyRemaining|number_format(2) }}
-                    <span class="text-base font-normal opacity-70">remaining</span>
-                </p>
-                <p class="text-sm opacity-70">
-                    ${{ weeklySpent|number_format(2) }} of ${{ weeklyBudget|number_format(2) }} spent
-                </p>
-                {% set weeklyPct = weeklyBudget > 0 ? (weeklySpent / weeklyBudget * 100)|round : 0 %}
-                <progress class="progress progress-primary w-full"
-                          value="{{ weeklyPct }}" max="100"></progress>
-            </div>
-        </div>
-
-        {# Monthly #}
-        <div class="card bg-base-100 shadow-xl">
-            <div class="card-body">
-                <h2 class="card-title">Monthly Budget</h2>
-                <p class="text-3xl font-bold">${{ monthlyRemaining|number_format(2) }}
-                    <span class="text-base font-normal opacity-70">remaining</span>
-                </p>
-                <p class="text-sm opacity-70">
-                    ${{ monthlySpent|number_format(2) }} of ${{ monthlyBudget|number_format(2) }} spent
-                </p>
-                {% set monthlyPct = monthlyBudget > 0 ? (monthlySpent / monthlyBudget * 100)|round : 0 %}
-                <progress class="progress progress-secondary w-full"
-                          value="{{ monthlyPct }}" max="100"></progress>
-            </div>
+    {# ── Budget summary card (active budget) ── #}
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title">{{ budgetLabel }} Budget</h2>
+            <p class="text-3xl font-bold">${{ budgetRemaining|number_format(2) }}
+                <span class="text-base font-normal opacity-70">remaining</span>
+            </p>
+            <p class="text-sm opacity-70">
+                ${{ budgetSpent|number_format(2) }} of ${{ budgetLimit|number_format(2) }} spent
+            </p>
+            {% set pct = budgetLimit > 0 ? (budgetSpent / budgetLimit * 100)|round : 0 %}
+            <progress class="progress progress-primary w-full"
+                      value="{{ pct }}" max="100"></progress>
         </div>
     </div>
 
     {# ── Spending by category chart ── #}
-    {% if categories|length > 0 %}
+    {% if chartLabels|length > 0 %}
     <div class="card bg-base-100 shadow-xl">
         <div class="card-body">
             <h2 class="card-title">Spending by Category</h2>
@@ -59,11 +40,11 @@
             <form method="POST" action="{{ url_for('transactions.store') }}"
                   class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
                 <div class="form-control">
-                    <label class="label"><span class="label-text">Type</span></label>
+                    <label class="label"><span class="label-text">Category</span></label>
                     <select name="type" class="select select-bordered w-full" required>
                         <option disabled selected value="">Pick one</option>
-                        {% for t in transactionTypes %}
-                            <option value="{{ t.value }}">{{ t.value }}</option>
+                        {% for cat in categories %}
+                            <option value="{{ cat }}">{{ cat }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -97,7 +78,7 @@
                         <tr>
                             <th>#</th>
                             <th>Date</th>
-                            <th>Type</th>
+                            <th>Category</th>
                             <th>Description</th>
                             <th>Amount</th>
                         </tr>
@@ -128,16 +109,16 @@
 {% endblock %}
 
 {% block scripts %}
-{% if categories|length > 0 %}
+{% if chartLabels|length > 0 %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     new Chart(document.getElementById('categoryChart'), {
         type: 'doughnut',
         data: {
-            labels: {{ categories|json_encode|raw }},
+            labels: {{ chartLabels|json_encode|raw }},
             datasets: [{
-                data: {{ categoryTotals|json_encode|raw }},
-                backgroundColor: ['#f87171','#fb923c','#facc15','#4ade80','#60a5fa','#a78bfa'],
+                data: {{ chartData|json_encode|raw }},
+                backgroundColor: ['#f87171','#fb923c','#facc15','#4ade80','#60a5fa','#a78bfa','#f472b6','#34d399'],
                 borderWidth: 2
             }]
         },

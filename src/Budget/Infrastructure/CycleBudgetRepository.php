@@ -20,10 +20,10 @@ final class CycleBudgetRepository implements BudgetRepositoryInterface
     #[\NoDiscard]
     public function findByType(BudgetType $type): ?Budget
     {
-        /** @var array{id: int|string, budgetType: string, amount: int|float|string}|false $row */
+        /** @var array{id: int|string, budgetType: string, amount: int|float|string, active: int|string}|false $row */
         $row = $this->dbal->database()
             ->query(
-                'SELECT id, budgetType, amount FROM budgets WHERE budgetType = ?',
+                'SELECT id, budgetType, amount, active FROM budgets WHERE budgetType = ?',
                 [$type->value]
             )
             ->fetch();
@@ -36,6 +36,27 @@ final class CycleBudgetRepository implements BudgetRepositoryInterface
             id:     (int) $row['id'],
             type:   BudgetType::from((string) $row['budgetType']),
             amount: MoneyAmount::fromFloat((float) $row['amount']),
+            active: (bool) $row['active'],
+        );
+    }
+
+    #[\NoDiscard]
+    public function findActive(): ?Budget
+    {
+        /** @var array{id: int|string, budgetType: string, amount: int|float|string, active: int|string}|false $row */
+        $row = $this->dbal->database()
+            ->query('SELECT id, budgetType, amount, active FROM budgets WHERE active = 1 LIMIT 1')
+            ->fetch();
+
+        if ($row === false) {
+            return null;
+        }
+
+        return Budget::reconstitute(
+            id:     (int) $row['id'],
+            type:   BudgetType::from((string) $row['budgetType']),
+            amount: MoneyAmount::fromFloat((float) $row['amount']),
+            active: true,
         );
     }
 
@@ -44,7 +65,7 @@ final class CycleBudgetRepository implements BudgetRepositoryInterface
     {
         /** @var array<int, array<string, mixed>> */
         return $this->dbal->database()
-            ->query('SELECT budgetType, amount FROM budgets')
+            ->query('SELECT budgetType, amount, active FROM budgets')
             ->fetchAll();
     }
 
@@ -57,5 +78,13 @@ final class CycleBudgetRepository implements BudgetRepositoryInterface
                 ['budgetType' => $budget->getType()->value],
             )
             ->run();
+    }
+
+    public function activateByType(BudgetType $type): void
+    {
+        $db = $this->dbal->database();
+
+        $db->update('budgets', ['active' => 0], [])->run();
+        $db->update('budgets', ['active' => 1], ['budgetType' => $type->value])->run();
     }
 }

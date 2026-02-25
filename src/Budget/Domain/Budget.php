@@ -11,27 +11,28 @@ class Budget extends AggregateRoot
     private function __construct(
         private BudgetType $type,
         private MoneyAmount $amount,
+        private bool $active = false,
     ) {
     }
 
     /**
      * Factory for creating a new budget.
      */
-    public static function create(BudgetType $type, MoneyAmount $amount): self
+    public static function create(BudgetType $type, MoneyAmount $amount, bool $active = false): self
     {
         if (!$amount->isPositive()) {
             throw new \DomainException('Budget amount must be positive.');
         }
 
-        return new self($type, $amount);
+        return new self($type, $amount, $active);
     }
 
     /**
      * Reconstitute from persistence — bypasses invariant checks.
      */
-    public static function reconstitute(int $id, BudgetType $type, MoneyAmount $amount): self
+    public static function reconstitute(int $id, BudgetType $type, MoneyAmount $amount, bool $active): self
     {
-        $budget = new self($type, $amount);
+        $budget = new self($type, $amount, $active);
         $budget->id = $id;
         return $budget;
     }
@@ -77,5 +78,10 @@ class Budget extends AggregateRoot
     public function getAmount(): MoneyAmount
     {
         return $this->amount;
+    }
+
+    public function isActive(): bool
+    {
+        return $this->active;
     }
 }

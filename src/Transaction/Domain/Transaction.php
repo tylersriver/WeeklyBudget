@@ -10,7 +10,7 @@ use App\Shared\Domain\AggregateRoot;
 class Transaction extends AggregateRoot
 {
     private function __construct(
-        private TransactionType $type,
+        private string $type,
         private TransactionDescription $description,
         private MoneyAmount $amount,
         private \DateTimeImmutable $dateAdded,
@@ -21,11 +21,15 @@ class Transaction extends AggregateRoot
      * Factory for recording a new transaction. Enforces all invariants.
      */
     public static function record(
-        TransactionType $type,
+        string $type,
         TransactionDescription $description,
         MoneyAmount $amount,
         \DateTimeImmutable $dateAdded,
     ): self {
+        if (trim($type) === '') {
+            throw new \DomainException('Transaction type must not be empty.');
+        }
+
         if (!$amount->isPositive()) {
             throw new \DomainException('Transaction amount must be positive.');
         }
@@ -38,7 +42,7 @@ class Transaction extends AggregateRoot
      */
     public static function reconstitute(
         int $id,
-        TransactionType $type,
+        string $type,
         TransactionDescription $description,
         MoneyAmount $amount,
         \DateTimeImmutable $dateAdded,
@@ -48,7 +52,7 @@ class Transaction extends AggregateRoot
         return $txn;
     }
 
-    public function getType(): TransactionType
+    public function getType(): string
     {
         return $this->type;
     }

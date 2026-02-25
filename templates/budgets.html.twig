@@ -13,25 +13,34 @@
     </div>
     {% endif %}
 
-    {# ── Current budgets ── #}
+    {# ── Budget configuration ── #}
     <div class="card bg-base-100 shadow-xl">
         <div class="card-body">
-            <h2 class="card-title">Current Budgets</h2>
+            <h2 class="card-title">Budgets</h2>
             <div class="overflow-x-auto">
                 <table class="table table-zebra">
                     <thead>
                         <tr>
-                            <th>#</th>
-                            <th>Budget</th>
+                            <th>Type</th>
                             <th>Amount</th>
+                            <th>Active</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for b in budgets %}
                         <tr>
-                            <td>{{ loop.index }}</td>
                             <td>{{ b.budgetType|capitalize }}</td>
                             <td>${{ b.amount|number_format(2) }}</td>
+                            <td>
+                                {% if b.active %}
+                                    <span class="badge badge-success">Active</span>
+                                {% else %}
+                                    <form method="POST" action="{{ url_for('budgets.activate') }}" class="inline">
+                                        <input type="hidden" name="type" value="{{ b.budgetType }}">
+                                        <button type="submit" class="btn btn-xs btn-outline">Activate</button>
+                                    </form>
+                                {% endif %}
+                            </td>
                         </tr>
                         {% else %}
                         <tr>
@@ -41,13 +50,10 @@
                     </tbody>
                 </table>
             </div>
-        </div>
-    </div>
 
-    {# ── Update budget form ── #}
-    <div class="card bg-base-100 shadow-xl">
-        <div class="card-body">
-            <h2 class="card-title">Update Budget</h2>
+            {# ── Update budget amount ── #}
+            <div class="divider"></div>
+            <h3 class="font-semibold">Update Budget Amount</h3>
             <form method="POST" action="{{ url_for('budgets.update') }}"
                   class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
                 <div class="form-control">
@@ -64,6 +70,46 @@
                            class="input input-bordered w-full" required />
                 </div>
                 <button type="submit" class="btn btn-primary">Save</button>
+            </form>
+        </div>
+    </div>
+
+    {# ── Spending categories ── #}
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title">Spending Categories</h2>
+
+            <div class="flex flex-wrap gap-2">
+                {% for cat in categories %}
+                <div class="badge badge-lg gap-2">
+                    {{ cat }}
+                    <form method="POST" action="{{ url_for('categories.delete') }}" class="inline">
+                        <input type="hidden" name="name" value="{{ cat }}">
+                        <button type="submit" class="btn btn-ghost btn-xs px-0" aria-label="Remove {{ cat }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                 class="inline-block h-4 w-4 stroke-current">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+                {% else %}
+                <p class="opacity-50">No categories configured.</p>
+                {% endfor %}
+            </div>
+
+            {# ── Add category form ── #}
+            <div class="divider"></div>
+            <h3 class="font-semibold">Add Category</h3>
+            <form method="POST" action="{{ url_for('categories.store') }}"
+                  class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                <div class="form-control md:col-span-2">
+                    <label class="label"><span class="label-text">Category Name</span></label>
+                    <input name="name" type="text" placeholder="e.g. Entertainment"
+                           class="input input-bordered w-full" required />
+                </div>
+                <button type="submit" class="btn btn-primary">Add</button>
             </form>
         </div>
     </div>

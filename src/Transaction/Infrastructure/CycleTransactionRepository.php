@@ -20,7 +20,7 @@ final class CycleTransactionRepository implements TransactionRepositoryInterface
         $this->dbal->database()
             ->insert('transactions')
             ->values([
-                'type'        => $transaction->getType()->value,
+                'type'        => $transaction->getType(),
                 'description' => $transaction->getDescription()->toString(),
                 'amount'      => $transaction->getAmount()->toString(),
                 'dateAdded'   => $transaction->getDateAdded()->format('Y-m-d'),

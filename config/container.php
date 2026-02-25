@@ -52,6 +52,8 @@ $builder->addDefinitions([
         DI\autowire(App\Budget\Infrastructure\CycleBudgetRepository::class),
     App\Transaction\Domain\TransactionRepositoryInterface::class =>
         DI\autowire(App\Transaction\Infrastructure\CycleTransactionRepository::class),
+    App\Transaction\Domain\CategoryRepositoryInterface::class =>
+        DI\autowire(App\Transaction\Infrastructure\CycleCategoryRepository::class),
 ]);
 
 return $builder->build();

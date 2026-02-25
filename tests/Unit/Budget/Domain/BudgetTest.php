@@ -11,7 +11,13 @@ describe('Budget', function () {
         $budget = Budget::create(BudgetType::Weekly, MoneyAmount::fromFloat(200));
         expect($budget->getType())->toBe(BudgetType::Weekly);
         expect($budget->getAmount()->toFloat())->toBe(200.0);
+        expect($budget->isActive())->toBeFalse();
         expect($budget->getId())->toBeNull();
+    });
+
+    it('creates with active flag', function () {
+        $budget = Budget::create(BudgetType::Weekly, MoneyAmount::fromFloat(200), true);
+        expect($budget->isActive())->toBeTrue();
     });
 
     it('rejects zero amount on create', function () {
@@ -19,10 +25,11 @@ describe('Budget', function () {
     })->throws(DomainException::class, 'Budget amount must be positive.');
 
     it('reconstitutes from persistence with id', function () {
-        $budget = Budget::reconstitute(5, BudgetType::Monthly, MoneyAmount::fromFloat(800));
+        $budget = Budget::reconstitute(5, BudgetType::Monthly, MoneyAmount::fromFloat(800), true);
         expect($budget->getId())->toBe(5);
         expect($budget->getType())->toBe(BudgetType::Monthly);
         expect($budget->getAmount()->toFloat())->toBe(800.0);
+        expect($budget->isActive())->toBeTrue();
     });
 
     it('returns a new instance on updateAmount', function () {
@@ -58,9 +65,9 @@ describe('Budget', function () {
     });
 
     it('checks equality by id', function () {
-        $a = Budget::reconstitute(1, BudgetType::Weekly, MoneyAmount::fromFloat(200));
-        $b = Budget::reconstitute(1, BudgetType::Weekly, MoneyAmount::fromFloat(300));
-        $c = Budget::reconstitute(2, BudgetType::Monthly, MoneyAmount::fromFloat(200));
+        $a = Budget::reconstitute(1, BudgetType::Weekly, MoneyAmount::fromFloat(200), true);
+        $b = Budget::reconstitute(1, BudgetType::Weekly, MoneyAmount::fromFloat(300), false);
+        $c = Budget::reconstitute(2, BudgetType::Monthly, MoneyAmount::fromFloat(200), false);
 
         expect($a->equals($b))->toBeTrue();
         expect($a->equals($c))->toBeFalse();

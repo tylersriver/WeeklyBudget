@@ -11,7 +11,7 @@ use App\Budget\Domain\MoneyAmount;
 
 describe('UpdateBudgetHandler', function () {
     it('updates an existing budget and saves it', function () {
-        $existing = Budget::reconstitute(1, BudgetType::Weekly, MoneyAmount::fromFloat(200));
+        $existing = Budget::reconstitute(1, BudgetType::Weekly, MoneyAmount::fromFloat(200), true);
         $saved = null;
 
         $repo = Mockery::mock(BudgetRepositoryInterface::class);

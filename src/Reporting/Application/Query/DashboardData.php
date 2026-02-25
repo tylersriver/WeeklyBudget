@@ -5,23 +5,21 @@ declare(strict_types=1);
 namespace App\Reporting\Application\Query;
 
 use App\Reporting\Domain\SpendingSummary;
-use App\Transaction\Domain\TransactionType;
 
 readonly class DashboardData
 {
     /**
      * @param array<int, array<string, mixed>> $transactions
-     * @param array<TransactionType>            $transactionTypes
      * @param string[]                          $categories
-     * @param float[]                           $categoryTotals
+     * @param string[]                          $chartLabels
+     * @param float[]                           $chartData
      */
     public function __construct(
-        public SpendingSummary $weekly,
-        public SpendingSummary $monthly,
+        public SpendingSummary $budget,
         public array $transactions,
-        public array $transactionTypes,
         public array $categories,
-        public array $categoryTotals,
+        public array $chartLabels,
+        public array $chartData,
     ) {
     }
 
@@ -34,16 +32,15 @@ readonly class DashboardData
     public function toTemplateVars(): array
     {
         return [
-            'weeklyBudget'     => $this->weekly->limit->toFloat(),
-            'monthlyBudget'    => $this->monthly->limit->toFloat(),
-            'weeklySpent'      => $this->weekly->spent->toFloat(),
-            'monthlySpent'     => $this->monthly->spent->toFloat(),
-            'weeklyRemaining'  => $this->weekly->remaining()->toFloat(),
-            'monthlyRemaining' => $this->monthly->remaining()->toFloat(),
-            'transactions'     => $this->transactions,
-            'transactionTypes' => $this->transactionTypes,
-            'categories'       => $this->categories,
-            'categoryTotals'   => $this->categoryTotals,
+            'budgetType'      => $this->budget->type->value,
+            'budgetLabel'     => ucfirst($this->budget->type->value),
+            'budgetLimit'     => $this->budget->limit->toFloat(),
+            'budgetSpent'     => $this->budget->spent->toFloat(),
+            'budgetRemaining' => $this->budget->remaining()->toFloat(),
+            'transactions'    => $this->transactions,
+            'categories'      => $this->categories,
+            'chartLabels'     => $this->chartLabels,
+            'chartData'       => $this->chartData,
         ];
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Transaction\Application\Command\RecordTransactionCommand;
 use App\Transaction\Application\Command\RecordTransactionHandler;
+use App\Transaction\Domain\CategoryRepositoryInterface;
 use App\Transaction\Domain\Transaction;
 use App\Transaction\Domain\TransactionRepositoryInterface;
 
@@ -17,7 +18,10 @@ describe('RecordTransactionHandler', function () {
             return true;
         }));
 
-        $handler = new RecordTransactionHandler($repo);
+        $categories = Mockery::mock(CategoryRepositoryInterface::class);
+        $categories->allows('exists')->with('Food')->andReturn(true);
+
+        $handler = new RecordTransactionHandler($repo, $categories);
         $handler(new RecordTransactionCommand(
             type: 'Food',
             description: 'Lunch at cafe',
@@ -26,14 +30,18 @@ describe('RecordTransactionHandler', function () {
         ));
 
         expect($saved)->not->toBeNull();
-        expect($saved->getType()->value)->toBe('Food');
+        expect($saved->getType())->toBe('Food');
         expect($saved->getDescription()->toString())->toBe('Lunch at cafe');
         expect($saved->getAmount()->toFloat())->toBe(15.5);
     });
 
-    it('throws on invalid transaction type', function () {
+    it('throws on invalid category', function () {
         $repo = Mockery::mock(TransactionRepositoryInterface::class);
-        $handler = new RecordTransactionHandler($repo);
+
+        $categories = Mockery::mock(CategoryRepositoryInterface::class);
+        $categories->allows('exists')->with('InvalidType')->andReturn(false);
+
+        $handler = new RecordTransactionHandler($repo, $categories);
 
         $handler(new RecordTransactionCommand(
             type: 'InvalidType',
@@ -41,11 +49,15 @@ describe('RecordTransactionHandler', function () {
             amount: '10.00',
             date: '2026-02-25',
         ));
-    })->throws(ValueError::class);
+    })->throws(DomainException::class, 'Invalid category');
 
     it('throws on empty description', function () {
         $repo = Mockery::mock(TransactionRepositoryInterface::class);
-        $handler = new RecordTransactionHandler($repo);
+
+        $categories = Mockery::mock(CategoryRepositoryInterface::class);
+        $categories->allows('exists')->with('Food')->andReturn(true);
+
+        $handler = new RecordTransactionHandler($repo, $categories);
 
         $handler(new RecordTransactionCommand(
             type: 'Food',
