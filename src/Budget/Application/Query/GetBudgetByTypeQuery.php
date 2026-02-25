@@ -12,7 +12,8 @@ final class GetBudgetByTypeQuery
 {
     public function __construct(
         private readonly BudgetRepositoryInterface $budgets,
-    ) {}
+    ) {
+    }
 
     #[\NoDiscard]
     public function __invoke(BudgetType $type): ?Budget

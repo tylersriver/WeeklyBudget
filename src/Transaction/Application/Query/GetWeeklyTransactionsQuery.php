@@ -11,7 +11,8 @@ final class GetWeeklyTransactionsQuery
 {
     public function __construct(
         private readonly TransactionRepositoryInterface $transactions,
-    ) {}
+    ) {
+    }
 
     /**
      * @return array{transactions: array<int, array<string, mixed>>, transactionTypes: array<TransactionType>}

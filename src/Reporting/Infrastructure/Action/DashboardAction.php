@@ -14,7 +14,8 @@ final class DashboardAction
     public function __construct(
         private readonly Twig $view,
         private readonly GetDashboardQuery $getDashboard,
-    ) {}
+    ) {
+    }
 
     public function __invoke(Request $request, Response $response): Response
     {

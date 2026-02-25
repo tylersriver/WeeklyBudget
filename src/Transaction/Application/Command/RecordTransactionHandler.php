@@ -14,7 +14,8 @@ final class RecordTransactionHandler
 {
     public function __construct(
         private readonly TransactionRepositoryInterface $transactions,
-    ) {}
+    ) {
+    }
 
     public function __invoke(RecordTransactionCommand $command): void
     {

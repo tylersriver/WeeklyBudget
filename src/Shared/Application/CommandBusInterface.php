@@ -15,7 +15,6 @@ interface CommandBusInterface
     /**
      * Dispatch a command to its resolved handler.
      *
-     * @template T
      * @param object $command The command DTO to dispatch
      * @return mixed The handler's return value
      */

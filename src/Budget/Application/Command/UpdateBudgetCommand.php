@@ -9,5 +9,6 @@ readonly class UpdateBudgetCommand
     public function __construct(
         public string $type,
         public int $amount,
-    ) {}
+    ) {
+    }
 }

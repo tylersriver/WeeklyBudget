@@ -17,14 +17,15 @@ final class ContainerCommandBus implements CommandBusInterface
 {
     public function __construct(
         private readonly ContainerInterface $container,
-    ) {}
+    ) {
+    }
 
     public function dispatch(object $command): mixed
     {
         $commandClass = $command::class;
         $handlerClass = preg_replace('/Command$/', 'Handler', $commandClass);
 
-        if ($handlerClass === $commandClass) {
+        if ($handlerClass === null || $handlerClass === $commandClass) {
             throw new \InvalidArgumentException(
                 "Command class name must end with 'Command': {$commandClass}",
             );
@@ -36,8 +37,9 @@ final class ContainerCommandBus implements CommandBusInterface
             );
         }
 
+        /** @var callable(object): mixed $handler */
         $handler = $this->container->get($handlerClass);
 
-        return ($handler)($command);
+        return $handler($command);
     }
 }

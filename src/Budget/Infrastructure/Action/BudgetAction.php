@@ -17,7 +17,8 @@ final class BudgetAction
         private readonly Twig $view,
         private readonly GetAllBudgetsQuery $getAllBudgets,
         private readonly CommandBusInterface $commandBus,
-    ) {}
+    ) {
+    }
 
     public function index(Request $request, Response $response): Response
     {
@@ -28,9 +29,10 @@ final class BudgetAction
 
     public function update(Request $request, Response $response): Response
     {
+        /** @var array<string, string> $body */
         $body   = (array) $request->getParsedBody();
-        $type   = $body['type']   ?? '';
-        $amount = (int) ($body['amount'] ?? 0);
+        $type   = (string) ($body['type'] ?? '');
+        $amount = (int) ($body['amount'] ?? '0');
 
         $success = $this->commandBus->dispatch(new UpdateBudgetCommand(
             type:   $type,

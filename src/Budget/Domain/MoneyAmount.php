@@ -8,7 +8,8 @@ readonly class MoneyAmount
 {
     private function __construct(
         private string $amount,
-    ) {}
+    ) {
+    }
 
     public static function fromString(string $amount): self
     {

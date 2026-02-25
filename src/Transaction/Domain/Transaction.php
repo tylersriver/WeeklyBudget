@@ -14,7 +14,8 @@ class Transaction extends AggregateRoot
         private TransactionDescription $description,
         private MoneyAmount $amount,
         private \DateTimeImmutable $dateAdded,
-    ) {}
+    ) {
+    }
 
     /**
      * Factory for recording a new transaction. Enforces all invariants.

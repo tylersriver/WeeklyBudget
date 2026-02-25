@@ -22,7 +22,8 @@ readonly class DashboardData
         public array $transactionTypes,
         public array $categories,
         public array $categoryTotals,
-    ) {}
+    ) {
+    }
 
     /**
      * Convert to the template variable array expected by dashboard.html.twig.

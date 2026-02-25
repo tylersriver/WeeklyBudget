@@ -14,11 +14,13 @@ final class CycleBudgetRepository implements BudgetRepositoryInterface
 {
     public function __construct(
         private readonly DatabaseManager $dbal,
-    ) {}
+    ) {
+    }
 
     #[\NoDiscard]
     public function findByType(BudgetType $type): ?Budget
     {
+        /** @var array{id: int|string, budgetType: string, amount: int|float|string}|false $row */
         $row = $this->dbal->database()
             ->query(
                 'SELECT id, budgetType, amount FROM budgets WHERE budgetType = ?',
@@ -32,7 +34,7 @@ final class CycleBudgetRepository implements BudgetRepositoryInterface
 
         return Budget::reconstitute(
             id:     (int) $row['id'],
-            type:   BudgetType::from($row['budgetType']),
+            type:   BudgetType::from((string) $row['budgetType']),
             amount: MoneyAmount::fromFloat((float) $row['amount']),
         );
     }
@@ -40,6 +42,7 @@ final class CycleBudgetRepository implements BudgetRepositoryInterface
     #[\NoDiscard]
     public function findAll(): array
     {
+        /** @var array<int, array<string, mixed>> */
         return $this->dbal->database()
             ->query('SELECT budgetType, amount FROM budgets')
             ->fetchAll();

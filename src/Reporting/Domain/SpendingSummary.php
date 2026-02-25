@@ -13,7 +13,8 @@ readonly class SpendingSummary
         public BudgetType $type,
         public MoneyAmount $limit,
         public MoneyAmount $spent,
-    ) {}
+    ) {
+    }
 
     #[\NoDiscard]
     public function remaining(): MoneyAmount

@@ -14,7 +14,8 @@ final class HistoryAction
     public function __construct(
         private readonly Twig $view,
         private readonly GetMonthlyTransactionsQuery $getMonthlyTransactions,
-    ) {}
+    ) {
+    }
 
     public function index(Request $request, Response $response): Response
     {
@@ -26,6 +27,7 @@ final class HistoryAction
 
     public function filter(Request $request, Response $response): Response
     {
+        /** @var array<string, string> $body */
         $body  = (array) $request->getParsedBody();
         $month = (int) ($body['month'] ?? date('n'));
         $year  = (int) ($body['year']  ?? date('Y'));

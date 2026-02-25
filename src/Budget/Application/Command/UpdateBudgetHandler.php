@@ -12,7 +12,8 @@ final class UpdateBudgetHandler
 {
     public function __construct(
         private readonly BudgetRepositoryInterface $budgets,
-    ) {}
+    ) {
+    }
 
     /**
      * @return bool Whether the update succeeded.

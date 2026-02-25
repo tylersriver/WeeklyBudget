@@ -16,7 +16,8 @@ final class GetDashboardQuery
     public function __construct(
         private readonly BudgetRepositoryInterface $budgets,
         private readonly TransactionRepositoryInterface $transactions,
-    ) {}
+    ) {
+    }
 
     #[\NoDiscard]
     public function __invoke(): DashboardData

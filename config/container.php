@@ -48,11 +48,14 @@ $builder->addDefinitions([
     },
 
     // Application → Infrastructure bindings (Ports → Adapters)
-    App\Shared\Application\CommandBusInterface::class            => DI\autowire(App\Shared\Infrastructure\ContainerCommandBus::class),
+    App\Shared\Application\CommandBusInterface::class =>
+        DI\autowire(App\Shared\Infrastructure\ContainerCommandBus::class),
 
     // Domain → Infrastructure bindings (Ports → Adapters)
-    App\Budget\Domain\BudgetRepositoryInterface::class           => DI\autowire(App\Budget\Infrastructure\CycleBudgetRepository::class),
-    App\Transaction\Domain\TransactionRepositoryInterface::class => DI\autowire(App\Transaction\Infrastructure\CycleTransactionRepository::class),
+    App\Budget\Domain\BudgetRepositoryInterface::class =>
+        DI\autowire(App\Budget\Infrastructure\CycleBudgetRepository::class),
+    App\Transaction\Domain\TransactionRepositoryInterface::class =>
+        DI\autowire(App\Transaction\Infrastructure\CycleTransactionRepository::class),
 ]);
 
 return $builder->build();

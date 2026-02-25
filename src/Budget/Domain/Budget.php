@@ -11,7 +11,8 @@ class Budget extends AggregateRoot
     private function __construct(
         private BudgetType $type,
         private MoneyAmount $amount,
-    ) {}
+    ) {
+    }
 
     /**
      * Factory for creating a new budget.

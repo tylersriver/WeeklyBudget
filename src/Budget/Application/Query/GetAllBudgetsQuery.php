@@ -11,7 +11,8 @@ final class GetAllBudgetsQuery
 {
     public function __construct(
         private readonly BudgetRepositoryInterface $budgets,
-    ) {}
+    ) {
+    }
 
     /**
      * @return array{budgets: array<int, array<string, mixed>>, budgetTypes: array<BudgetType>}
