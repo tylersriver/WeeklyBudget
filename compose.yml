@@ -1,0 +1,17 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8080:80"
+    env_file: .env
+    environment:
+      PORT: "80"
+      FRANKENPHP_CONFIG: "worker ./public/index.php"
+    volumes:
+      - .:/app
+      - /app/vendor
+      - sqlite_data:/app/var/data
+    tty: true
+
+volumes:
+  sqlite_data:

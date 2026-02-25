@@ -1,28 +1,32 @@
-create database WeeklyBudget;
-
-Use WeeklyBudget;
-
 --
--- Transactions table
+-- SQLite schema for WeeklyBudget
 --
-DROP TABLE IF EXISTS Transactions;
-CREATE TABLE Transactions (
-    id int(11) AUTO_INCREMENT primary key,
-    dateAdded date NOT NULL,
-    type text NOT NULL,
-    description text NOT NULL,
-    amount decimal(4,2) NOT NULL
+
+CREATE TABLE IF NOT EXISTS transactions (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    dateAdded   TEXT NOT NULL,
+    type        TEXT NOT NULL,
+    description TEXT NOT NULL,
+    amount      REAL NOT NULL
 );
 
---
--- weekMaxValues table
---
-DROP TABLE IF EXISTS budgets;
-CREATE TABLE budgets (
-    id int(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    budgetType text not null,
-    amount int not null
+CREATE TABLE IF NOT EXISTS budgets (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    budgetType TEXT NOT NULL,
+    amount     INTEGER NOT NULL,
+    active     INTEGER NOT NULL DEFAULT 0
 );
 
-INSERT INTO budgets (budgetType, amount) values ('weekly', 200);
-INSERT INTO budgets (budgetType, amount) values ('monthly', 800);
+CREATE TABLE IF NOT EXISTS categories (
+    id   INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL UNIQUE
+);
+
+INSERT OR IGNORE INTO budgets (id, budgetType, amount, active) VALUES (1, 'weekly', 200, 1);
+INSERT OR IGNORE INTO budgets (id, budgetType, amount, active) VALUES (2, 'monthly', 800, 0);
+
+INSERT OR IGNORE INTO categories (id, name) VALUES (1, 'Food');
+INSERT OR IGNORE INTO categories (id, name) VALUES (2, 'Groceries');
+INSERT OR IGNORE INTO categories (id, name) VALUES (3, 'Gas');
+INSERT OR IGNORE INTO categories (id, name) VALUES (4, 'Shopping');
+INSERT OR IGNORE INTO categories (id, name) VALUES (5, 'Other');

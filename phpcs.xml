@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<ruleset name="WeeklyBudget">
+    <description>PSR-12 coding standard for WeeklyBudget</description>
+
+    <rule ref="PSR12"/>
+
+    <file>src</file>
+    <file>tests</file>
+    <file>config</file>
+
+    <!-- Files using PHP 8.5 pipe operator — not parseable on PHP <8.5 -->
+    <exclude-pattern>src/Transaction/Infrastructure/CycleTransactionRepository.php</exclude-pattern>
+    <exclude-pattern>src/Transaction/Infrastructure/Action/TransactionAction.php</exclude-pattern>
+
+    <arg name="colors"/>
+    <arg value="sp"/>
+</ruleset>
