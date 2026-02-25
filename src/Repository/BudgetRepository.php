@@ -10,22 +10,22 @@ use Cycle\Database\DatabaseManager;
 class BudgetRepository
 {
     public function __construct(
-        private DatabaseManager $dbal,
+        private readonly DatabaseManager $dbal,
     ) {}
 
     /**
      * Get the budget limit for a given type.
      */
+    #[\NoDiscard('Budget setting should be used')]
     public function getBudgetSetting(BudgetType $type): int
     {
-        $row = $this->dbal->database()
+        return $this->dbal->database()
             ->query(
                 'SELECT amount FROM budgets WHERE budgetType = ?',
                 [$type->value]
             )
-            ->fetch();
-
-        return (int) ($row['amount'] ?? 0);
+            ->fetch()
+            |> (static fn(array|false $row): int => (int) ($row['amount'] ?? 0));
     }
 
     /**
@@ -33,6 +33,7 @@ class BudgetRepository
      *
      * @return array<int, array<string, mixed>>
      */
+    #[\NoDiscard]
     public function getAll(): array
     {
         return $this->dbal->database()

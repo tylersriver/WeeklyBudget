@@ -13,8 +13,8 @@ use Slim\Views\Twig;
 final class BudgetAction
 {
     public function __construct(
-        private Twig $view,
-        private BudgetRepository $budgets,
+        private readonly Twig $view,
+        private readonly BudgetRepository $budgets,
     ) {}
 
     public function index(Request $request, Response $response): Response

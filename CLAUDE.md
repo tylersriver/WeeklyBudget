@@ -6,7 +6,7 @@ WeeklyBudget is a PHP web application for tracking personal weekly and monthly b
 
 ## Tech Stack
 
-- **Language**: PHP 8.3+ (strict types, enums, named arguments, constructor promotion)
+- **Language**: PHP 8.5+ (strict types, pipe operator, readonly classes, `#[\NoDiscard]`, enums, constructor promotion)
 - **Framework**: Slim 4 (PSR-7 / PSR-15 micro-framework)
 - **Runtime**: FrankenPHP (worker mode for persistent-process performance)
 - **ORM**: Cycle ORM v2 (annotated entities, DataMapper pattern)
@@ -85,7 +85,7 @@ WeeklyBudget/
 ## Key Components
 
 ### Entities (`src/Entity/`)
-Cycle ORM annotated entities with `#[Entity]` and `#[Column]` attributes. Map directly to the existing `transactions` and `budgets` MySQL tables.
+`readonly` classes with Cycle ORM `#[Entity]` and `#[Column]` attributes. Map directly to the existing `transactions` and `budgets` MySQL tables.
 
 ### Repositories (`src/Repository/`)
 - **TransactionRepository** — `getWeeklySpent()`, `getMonthlySpent()`, `getTransactionsThisWeek()`, `getTransactionsForMonth()`, `getYearsForTransactions()`, `getMonthlySpendingByCategory()`, `insert()`
@@ -116,8 +116,11 @@ Schema file: `Schema/weeklyBudget.sql`
 - **PSR-4** namespacing: `App\Action`, `App\Entity`, `App\Repository`, `App\Enum`
 - **Class names**: PascalCase (`DashboardAction`, `TransactionRepository`)
 - **Methods**: camelCase (`getWeeklySpent`, `insert`)
-- **Constructor promotion** for dependency injection
+- **Constructor promotion** with `readonly` for dependency injection
 - **Backed enums** for type-safe domain values
+- **Pipe operator (`|>`)** for data transformation chains in repositories
+- **`#[\NoDiscard]`** on repository read methods to prevent silent discard
+- **`readonly` entities** — immutable data objects
 - **PHPDoc blocks** on all public repository methods
 - **Twig templates**: `*.html.twig` with DaisyUI component classes
 - **No `echo`/`print`** — all output via Twig rendering
@@ -135,7 +138,7 @@ The MySQL container auto-imports `Schema/weeklyBudget.sql` on first run.
 
 ### Local development
 
-Requirements: PHP 8.2+ with pdo_mysql, MySQL server, Composer
+Requirements: PHP 8.5+ with pdo_mysql, MySQL server, Composer
 
 ```bash
 composer install
@@ -173,6 +176,9 @@ No linter, formatter, or pre-commit hooks are configured.
 - **Adding routes** — register in `config/routes.php`, create corresponding Action class in `src/Action/`.
 - **Twig auto-escapes** HTML by default — safer than raw PHP views. Use `|raw` only for trusted content.
 - **Repositories use raw SQL** via Cycle DBAL (not the Cycle ORM query builder) for compatibility with the existing schema. Queries are parameterized.
-- **FrankenPHP worker mode** — the app boots once. Avoid storing request-scoped state in static properties or global variables.
+- **FrankenPHP worker mode** — the app boots once. All services (repositories, actions) are stateless singletons safe for reuse across requests. Avoid storing request-scoped state in static properties or global variables.
+- **Worker-mode DB reconnect** — the worker loop pings MySQL before each request and reconnects on failure (guards against idle timeout drops). The MySQL driver is configured with `reconnect: true`.
+- **No ORM identity map** — repositories use raw DBAL queries, not the Cycle ORM entity manager. This avoids heap accumulation across worker requests.
 - **DaisyUI components** — use DaisyUI class names (`card`, `table`, `btn`, `badge`, etc.) in templates. Refer to https://daisyui.com/components/.
 - **Alpine.js** — used for client-side interactivity (chart init, toast auto-dismiss). Directives like `x-data`, `x-init`, `x-show` are in Twig templates.
+- **PHP 8.5 features** — use pipe operator (`|>`) for chained data transforms, `#[\NoDiscard]` for methods whose results must be consumed, `readonly` classes for immutable entities, and `static` closures in DI definitions for worker safety.

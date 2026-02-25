@@ -12,8 +12,8 @@ use Slim\Views\Twig;
 final class HistoryAction
 {
     public function __construct(
-        private Twig $view,
-        private TransactionRepository $transactions,
+        private readonly Twig $view,
+        private readonly TransactionRepository $transactions,
     ) {}
 
     public function index(Request $request, Response $response): Response

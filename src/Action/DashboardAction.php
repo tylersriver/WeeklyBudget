@@ -15,9 +15,9 @@ use Slim\Views\Twig;
 final class DashboardAction
 {
     public function __construct(
-        private Twig $view,
-        private TransactionRepository $transactions,
-        private BudgetRepository $budgets,
+        private readonly Twig $view,
+        private readonly TransactionRepository $transactions,
+        private readonly BudgetRepository $budgets,
     ) {}
 
     public function __invoke(Request $request, Response $response): Response

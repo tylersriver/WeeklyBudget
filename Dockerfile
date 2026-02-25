@@ -1,4 +1,4 @@
-FROM dunglas/frankenphp:latest-php8.3-bookworm
+FROM dunglas/frankenphp:latest-php8.5-bookworm
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer

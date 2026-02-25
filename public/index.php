@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 require __DIR__ . '/../vendor/autoload.php';
 
+use Cycle\Database\DatabaseManager;
 use Slim\Factory\AppFactory;
 
 // Load environment variables
@@ -20,7 +21,17 @@ $app = AppFactory::create();
 
 // FrankenPHP worker mode
 if (function_exists('frankenphp_handle_request')) {
-    $handler = static function () use ($app): void {
+    $dbal = $container->get(DatabaseManager::class);
+
+    $handler = static function () use ($app, $dbal): void {
+        // Reconnect stale MySQL connections dropped during idle periods
+        try {
+            $dbal->database()->query('SELECT 1')->fetch();
+        } catch (\Throwable) {
+            $dbal->database()->getDriver()->disconnect();
+            $dbal->database()->getDriver()->connect();
+        }
+
         $app->run();
         gc_collect_cycles();
     };

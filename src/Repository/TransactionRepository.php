@@ -9,41 +9,41 @@ use Cycle\Database\DatabaseManager;
 class TransactionRepository
 {
     public function __construct(
-        private DatabaseManager $dbal,
+        private readonly DatabaseManager $dbal,
     ) {}
 
     /**
      * Sum of transaction amounts for the current week.
      */
+    #[\NoDiscard('Weekly spent total should be used')]
     public function getWeeklySpent(): float
     {
-        $row = $this->dbal->database()
+        return $this->dbal->database()
             ->query(
                 'SELECT COALESCE(SUM(amount), 0) AS total
                  FROM transactions
                  WHERE WEEKOFYEAR(dateAdded) = WEEKOFYEAR(NOW())
                    AND YEAR(dateAdded) = YEAR(NOW())'
             )
-            ->fetch();
-
-        return (float) $row['total'];
+            ->fetch()
+            |> (static fn(array $row): float => (float) $row['total']);
     }
 
     /**
      * Sum of transaction amounts for the current month.
      */
+    #[\NoDiscard('Monthly spent total should be used')]
     public function getMonthlySpent(): float
     {
-        $row = $this->dbal->database()
+        return $this->dbal->database()
             ->query(
                 'SELECT COALESCE(SUM(amount), 0) AS total
                  FROM transactions
                  WHERE MONTH(dateAdded) = MONTH(NOW())
                    AND YEAR(dateAdded) = YEAR(NOW())'
             )
-            ->fetch();
-
-        return (float) $row['total'];
+            ->fetch()
+            |> (static fn(array $row): float => (float) $row['total']);
     }
 
     /**
@@ -51,6 +51,7 @@ class TransactionRepository
      *
      * @return array<int, array<string, mixed>>
      */
+    #[\NoDiscard]
     public function getTransactionsThisWeek(): array
     {
         return $this->dbal->database()
@@ -70,6 +71,7 @@ class TransactionRepository
      *
      * @return array<int, array<string, mixed>>
      */
+    #[\NoDiscard]
     public function getTransactionsForMonth(int $year, int $month): array
     {
         return $this->dbal->database()
@@ -89,18 +91,21 @@ class TransactionRepository
      *
      * @return int[]
      */
+    #[\NoDiscard]
     public function getYearsForTransactions(): array
     {
-        $rows = $this->dbal->database()
+        return $this->dbal->database()
             ->query(
                 'SELECT YEAR(dateAdded) AS year
                  FROM transactions
                  GROUP BY YEAR(dateAdded)
                  ORDER BY year DESC'
             )
-            ->fetchAll();
-
-        return array_map(fn(array $r): int => (int) $r['year'], $rows);
+            ->fetchAll()
+            |> (static fn(array $rows): array => array_map(
+                static fn(array $r): int => (int) $r['year'],
+                $rows,
+            ));
     }
 
     /**
@@ -108,9 +113,10 @@ class TransactionRepository
      *
      * @return array<string, float>
      */
+    #[\NoDiscard]
     public function getMonthlySpendingByCategory(): array
     {
-        $rows = $this->dbal->database()
+        return $this->dbal->database()
             ->query(
                 'SELECT type, COALESCE(SUM(amount), 0) AS total
                  FROM transactions
@@ -118,13 +124,15 @@ class TransactionRepository
                    AND YEAR(dateAdded) = YEAR(NOW())
                  GROUP BY type'
             )
-            ->fetchAll();
-
-        $result = [];
-        foreach ($rows as $row) {
-            $result[$row['type']] = (float) $row['total'];
-        }
-        return $result;
+            ->fetchAll()
+            |> (static fn(array $rows): array => array_column(
+                array_map(
+                    static fn(array $r): array => ['type' => $r['type'], 'total' => (float) $r['total']],
+                    $rows,
+                ),
+                'total',
+                'type',
+            ));
     }
 
     /**

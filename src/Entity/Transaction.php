@@ -8,7 +8,7 @@ use Cycle\Annotated\Annotation\Entity;
 use Cycle\Annotated\Annotation\Column;
 
 #[Entity(table: 'transactions')]
-class Transaction
+readonly class Transaction
 {
     #[Column(type: 'primary')]
     public int $id;

@@ -12,7 +12,7 @@ use Slim\Routing\RouteContext;
 final class TransactionAction
 {
     public function __construct(
-        private TransactionRepository $transactions,
+        private readonly TransactionRepository $transactions,
     ) {}
 
     public function __invoke(Request $request, Response $response): Response
@@ -27,9 +27,9 @@ final class TransactionAction
             $this->transactions->insert($type, $description, $amount, $date);
         }
 
-        // Redirect back to dashboard
-        $routeParser = RouteContext::fromRequest($request)->getRouteParser();
-        $url = $routeParser->urlFor('dashboard');
+        // POST-redirect-GET back to dashboard
+        $url = RouteContext::fromRequest($request)->getRouteParser()
+            |> (static fn($parser): string => $parser->urlFor('dashboard'));
 
         return $response
             ->withHeader('Location', $url)
