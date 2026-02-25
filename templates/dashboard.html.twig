@@ -42,23 +42,7 @@
 
     {# ── Spending by category chart ── #}
     {% if categories|length > 0 %}
-    <div class="card bg-base-100 shadow-xl" x-data x-init="
-        new Chart(document.getElementById('categoryChart'), {
-            type: 'doughnut',
-            data: {
-                labels: {{ categories|json_encode|raw }},
-                datasets: [{
-                    data: {{ categoryTotals|json_encode|raw }},
-                    backgroundColor: ['#f87171','#fb923c','#facc15','#4ade80','#60a5fa','#a78bfa'],
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: { legend: { position: 'bottom' } }
-            }
-        })
-    ">
+    <div class="card bg-base-100 shadow-xl">
         <div class="card-body">
             <h2 class="card-title">Spending by Category</h2>
             <div class="flex justify-center">
@@ -141,4 +125,28 @@
     </div>
 
 </div>
+{% endblock %}
+
+{% block scripts %}
+{% if categories|length > 0 %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    new Chart(document.getElementById('categoryChart'), {
+        type: 'doughnut',
+        data: {
+            labels: {{ categories|json_encode|raw }},
+            datasets: [{
+                data: {{ categoryTotals|json_encode|raw }},
+                backgroundColor: ['#f87171','#fb923c','#facc15','#4ade80','#60a5fa','#a78bfa'],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { position: 'bottom' } }
+        }
+    });
+});
+</script>
+{% endif %}
 {% endblock %}
