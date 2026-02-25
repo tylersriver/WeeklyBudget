@@ -1,28 +1,20 @@
-create database WeeklyBudget;
-
-Use WeeklyBudget;
-
 --
--- Transactions table
+-- SQLite schema for WeeklyBudget
 --
-DROP TABLE IF EXISTS Transactions;
-CREATE TABLE Transactions (
-    id int(11) AUTO_INCREMENT primary key,
-    dateAdded date NOT NULL,
-    type text NOT NULL,
-    description text NOT NULL,
-    amount decimal(4,2) NOT NULL
+
+CREATE TABLE IF NOT EXISTS transactions (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    dateAdded   TEXT NOT NULL,
+    type        TEXT NOT NULL,
+    description TEXT NOT NULL,
+    amount      REAL NOT NULL
 );
 
---
--- weekMaxValues table
---
-DROP TABLE IF EXISTS budgets;
-CREATE TABLE budgets (
-    id int(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    budgetType text not null,
-    amount int not null
+CREATE TABLE IF NOT EXISTS budgets (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    budgetType TEXT NOT NULL,
+    amount     INTEGER NOT NULL
 );
 
-INSERT INTO budgets (budgetType, amount) values ('weekly', 200);
-INSERT INTO budgets (budgetType, amount) values ('monthly', 800);
+INSERT OR IGNORE INTO budgets (id, budgetType, amount) VALUES (1, 'weekly', 200);
+INSERT OR IGNORE INTO budgets (id, budgetType, amount) VALUES (2, 'monthly', 800);

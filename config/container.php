@@ -6,8 +6,8 @@ use DI\ContainerBuilder;
 use Psr\Container\ContainerInterface;
 use Slim\Views\Twig;
 use Cycle\Database\Config\DatabaseConfig;
-use Cycle\Database\Config\MySQLDriverConfig;
-use Cycle\Database\Config\MySQL\TcpConnectionConfig;
+use Cycle\Database\Config\SQLiteDriverConfig;
+use Cycle\Database\Config\SQLite\FileConnectionConfig;
 use Cycle\Database\DatabaseManager;
 
 $builder = new ContainerBuilder();
@@ -30,16 +30,12 @@ $builder->addDefinitions([
         return new DatabaseManager(new DatabaseConfig([
             'default'     => 'default',
             'databases'   => [
-                'default' => ['connection' => 'mysql'],
+                'default' => ['connection' => 'sqlite'],
             ],
             'connections' => [
-                'mysql' => new MySQLDriverConfig(
-                    connection: new TcpConnectionConfig(
-                        database: $db['database'],
-                        host:     $db['host'],
-                        port:     $db['port'],
-                        user:     $db['user'],
-                        password: $db['password'],
+                'sqlite' => new SQLiteDriverConfig(
+                    connection: new FileConnectionConfig(
+                        database: $db['path'],
                     ),
                     reconnect: true,
                 ),

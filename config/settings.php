@@ -7,11 +7,7 @@ return [
         'env' => $_ENV['APP_ENV'] ?? 'development',
     ],
     'db' => [
-        'host'     => $_ENV['DB_HOST'] ?? 'localhost',
-        'port'     => (int) ($_ENV['DB_PORT'] ?? 3306),
-        'database' => $_ENV['DB_NAME'] ?? 'WeeklyBudget',
-        'user'     => $_ENV['DB_USER'] ?? 'root',
-        'password' => $_ENV['DB_PASS'] ?? '',
+        'path' => $_ENV['DB_PATH'] ?? __DIR__ . '/../var/data/weeklybudget.sqlite',
     ],
     'twig' => [
         'path'  => __DIR__ . '/../templates',

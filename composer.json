@@ -10,10 +10,7 @@
         "php-di/php-di": "^7.0",
         "slim/twig-view": "^3.4",
         "twig/twig": "^3.14",
-        "cycle/orm": "^2.9",
-        "cycle/annotated": "^4.2",
         "cycle/database": "^2.12",
-        "cycle/schema-builder": "^2.9",
         "vlucas/phpdotenv": "^5.6"
     },
     "autoload": {

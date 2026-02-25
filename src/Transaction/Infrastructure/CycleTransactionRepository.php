@@ -33,10 +33,10 @@ final class CycleTransactionRepository implements TransactionRepositoryInterface
     {
         return $this->dbal->database()
             ->query(
-                'SELECT COALESCE(SUM(amount), 0) AS total
+                "SELECT COALESCE(SUM(amount), 0) AS total
                  FROM transactions
-                 WHERE WEEKOFYEAR(dateAdded) = WEEKOFYEAR(NOW())
-                   AND YEAR(dateAdded) = YEAR(NOW())'
+                 WHERE strftime('%W', dateAdded) = strftime('%W', 'now')
+                   AND strftime('%Y', dateAdded) = strftime('%Y', 'now')"
             )
             ->fetch()
             |> (static fn(array $row): MoneyAmount => MoneyAmount::fromFloat((float) $row['total']));
@@ -47,10 +47,10 @@ final class CycleTransactionRepository implements TransactionRepositoryInterface
     {
         return $this->dbal->database()
             ->query(
-                'SELECT COALESCE(SUM(amount), 0) AS total
+                "SELECT COALESCE(SUM(amount), 0) AS total
                  FROM transactions
-                 WHERE MONTH(dateAdded) = MONTH(NOW())
-                   AND YEAR(dateAdded) = YEAR(NOW())'
+                 WHERE strftime('%m', dateAdded) = strftime('%m', 'now')
+                   AND strftime('%Y', dateAdded) = strftime('%Y', 'now')"
             )
             ->fetch()
             |> (static fn(array $row): MoneyAmount => MoneyAmount::fromFloat((float) $row['total']));
@@ -61,12 +61,13 @@ final class CycleTransactionRepository implements TransactionRepositoryInterface
     {
         return $this->dbal->database()
             ->query(
-                'SELECT id, DATE_FORMAT(dateAdded, "%m/%d/%Y") AS date,
+                "SELECT id,
+                        strftime('%m/%d/%Y', dateAdded) AS date,
                         type, description, amount
                  FROM transactions
-                 WHERE WEEKOFYEAR(dateAdded) = WEEKOFYEAR(NOW())
-                   AND YEAR(dateAdded) = YEAR(NOW())
-                 ORDER BY dateAdded DESC'
+                 WHERE strftime('%W', dateAdded) = strftime('%W', 'now')
+                   AND strftime('%Y', dateAdded) = strftime('%Y', 'now')
+                 ORDER BY dateAdded DESC"
             )
             ->fetchAll();
     }
@@ -74,14 +75,18 @@ final class CycleTransactionRepository implements TransactionRepositoryInterface
     #[\NoDiscard]
     public function transactionsForMonth(int $year, int $month): array
     {
+        $m = str_pad((string) $month, 2, '0', STR_PAD_LEFT);
+        $y = (string) $year;
+
         return $this->dbal->database()
             ->query(
-                'SELECT DATE_FORMAT(dateAdded, "%m/%d/%Y") AS date,
+                "SELECT strftime('%m/%d/%Y', dateAdded) AS date,
                         type, description, amount
                  FROM transactions
-                 WHERE MONTH(dateAdded) = ? AND YEAR(dateAdded) = ?
-                 ORDER BY dateAdded DESC',
-                [$month, $year]
+                 WHERE strftime('%m', dateAdded) = ?
+                   AND strftime('%Y', dateAdded) = ?
+                 ORDER BY dateAdded DESC",
+                [$m, $y]
             )
             ->fetchAll();
     }
@@ -91,10 +96,10 @@ final class CycleTransactionRepository implements TransactionRepositoryInterface
     {
         return $this->dbal->database()
             ->query(
-                'SELECT YEAR(dateAdded) AS year
+                "SELECT CAST(strftime('%Y', dateAdded) AS INTEGER) AS year
                  FROM transactions
-                 GROUP BY YEAR(dateAdded)
-                 ORDER BY year DESC'
+                 GROUP BY strftime('%Y', dateAdded)
+                 ORDER BY year DESC"
             )
             ->fetchAll()
             |> (static fn(array $rows): array => array_map(
@@ -108,16 +113,19 @@ final class CycleTransactionRepository implements TransactionRepositoryInterface
     {
         return $this->dbal->database()
             ->query(
-                'SELECT type, COALESCE(SUM(amount), 0) AS total
+                "SELECT type, COALESCE(SUM(amount), 0) AS total
                  FROM transactions
-                 WHERE MONTH(dateAdded) = MONTH(NOW())
-                   AND YEAR(dateAdded) = YEAR(NOW())
-                 GROUP BY type'
+                 WHERE strftime('%m', dateAdded) = strftime('%m', 'now')
+                   AND strftime('%Y', dateAdded) = strftime('%Y', 'now')
+                 GROUP BY type"
             )
             ->fetchAll()
             |> (static fn(array $rows): array => array_column(
                 array_map(
-                    static fn(array $r): array => ['type' => $r['type'], 'total' => (float) $r['total']],
+                    static fn(array $r): array => [
+                        'type' => $r['type'],
+                        'total' => (float) $r['total'],
+                    ],
                     $rows,
                 ),
                 'total',

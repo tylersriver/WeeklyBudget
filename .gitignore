@@ -9,6 +9,7 @@
 
 # Runtime
 /var/cache/
+/var/data/
 /var/log/
 
 # Tailwind build output (regenerated from source)

@@ -3,8 +3,8 @@ FROM dunglas/frankenphp:1-php8.5-bookworm
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
 
-# Install PHP extensions for MySQL
-RUN install-php-extensions pdo_mysql
+# Install PHP extensions for SQLite
+RUN install-php-extensions pdo_sqlite
 
 WORKDIR /app
 
@@ -16,8 +16,9 @@ RUN composer install --no-dev --optimize-autoloader --no-scripts --ignore-platfo
 # Copy source code
 COPY . .
 
-# Ensure runtime directories exist
-RUN mkdir -p var/cache var/log
+# Ensure runtime directories exist and initialise SQLite database
+RUN mkdir -p var/cache var/log var/data \
+    && sqlite3 var/data/weeklybudget.sqlite < Schema/weeklyBudget.sql
 
 # Plain HTTP for local development (override SERVER_NAME for production)
 ENV SERVER_NAME=":80"

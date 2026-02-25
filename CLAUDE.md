@@ -10,7 +10,7 @@ WeeklyBudget is a PHP web application for tracking personal weekly and monthly b
 - **Framework**: Slim 4 (PSR-7 / PSR-15 micro-framework)
 - **Runtime**: FrankenPHP (worker mode for persistent-process performance)
 - **Architecture**: Domain-Driven Design (DDD) with CQRS at the service layer
-- **Database**: MySQL 8 via Cycle DBAL (raw SQL, parameterized queries)
+- **Database**: SQLite via Cycle DBAL (raw SQL, parameterized queries)
 - **Templating**: Twig 3 via `slim/twig-view`
 - **DI Container**: PHP-DI 7 (PSR-11, autowiring enabled)
 - **Frontend**: Tailwind CSS v4 + DaisyUI 5 (CDN), Alpine.js 3, Chart.js 4
@@ -89,15 +89,16 @@ WeeklyBudget/
 ├── resources/
 │   └── input.css                                  # Tailwind source (for standalone CLI builds)
 ├── Schema/
-│   └── weeklyBudget.sql                           # MySQL schema + seed data
+│   └── weeklyBudget.sql                           # SQLite schema + seed data
 ├── var/
 │   ├── cache/                                     # Twig compiled templates (production)
+│   ├── data/                                      # SQLite database file (git-ignored)
 │   └── log/
 ├── .env.example                                   # Environment template
 ├── composer.json
 ├── tailwind.config.js                             # Tailwind / DaisyUI config
 ├── Dockerfile                                     # FrankenPHP production image
-├── docker-compose.yml                             # App + MySQL services
+├── docker-compose.yml                             # App service with SQLite volume
 └── CLAUDE.md
 ```
 
@@ -179,11 +180,11 @@ Command DTOs are `readonly class`es. Handlers are `__invoke()`-able. Commands ar
 
 ## Database Schema
 
-**Database**: `WeeklyBudget`
+**Database**: SQLite — file at `var/data/weeklybudget.sqlite`
 
-**Table `transactions`**: `id` (int PK auto), `dateAdded` (date), `type` (text), `description` (text), `amount` (decimal 4,2)
+**Table `transactions`**: `id` (INTEGER PK AUTOINCREMENT), `dateAdded` (TEXT), `type` (TEXT), `description` (TEXT), `amount` (REAL)
 
-**Table `budgets`**: `id` (int PK auto), `budgetType` (text), `amount` (int) — seeded with weekly=200, monthly=800
+**Table `budgets`**: `id` (INTEGER PK AUTOINCREMENT), `budgetType` (TEXT), `amount` (INTEGER) — seeded with weekly=200, monthly=800
 
 Schema file: `Schema/weeklyBudget.sql`
 
@@ -214,16 +215,17 @@ cp .env.example .env    # edit credentials if needed
 docker compose up       # app at http://localhost:8080
 ```
 
-The MySQL container auto-imports `Schema/weeklyBudget.sql` on first run.
+The Dockerfile initialises the SQLite database from `Schema/weeklyBudget.sql` during build.
 
 ### Local development
 
-Requirements: PHP 8.5+ with pdo_mysql, MySQL server, Composer
+Requirements: PHP 8.5+ with pdo_sqlite, Composer, sqlite3 CLI
 
 ```bash
 composer install
 cp .env.example .env
-# Edit .env with your local DB credentials
+mkdir -p var/data
+sqlite3 var/data/weeklybudget.sqlite < Schema/weeklyBudget.sql
 php -S localhost:8080 -t public
 ```
 
@@ -242,16 +244,24 @@ chmod +x tailwindcss-linux-x64
 
 ## Testing
 
-No automated tests, test framework, or CI/CD pipeline exists in this project.
+PestPHP v4 with Mockery. 44 unit tests covering domain Value Objects, Aggregate Roots, command handlers, and the Command Bus.
 
-## Linting & Formatting
+```bash
+composer test          # or: vendor/bin/pest
+```
 
-No linter, formatter, or pre-commit hooks are configured.
+## Linting & Static Analysis
+
+- **PHPStan** at max level (9): `composer analyse`
+- **PHPCS** with PSR-12: `composer lint` (auto-fix: `composer lint:fix`)
+- **All checks**: `composer check`
+
+CI runs all three via GitHub Actions on PRs to master.
 
 ## Important Notes for AI Assistants
 
 - **Dependencies managed via Composer** — run `composer install` after cloning. No npm required (frontend is CDN).
-- **Database credentials** are in `.env` (git-ignored). Never commit `.env`. Use `.env.example` as template.
+- **Database path** is configured via `DB_PATH` in `.env` (git-ignored). Defaults to `var/data/weeklybudget.sqlite`. Never commit `.env`. Use `.env.example` as template.
 - **PSR-4 autoloading** — no `require_once` needed. Add new classes under `src/` with correct namespace.
 - **Adding a new feature** — identify the bounded context, add domain objects first, then application handlers, then infrastructure (repository adapter + HTTP action). Register routes in `config/routes.php`.
 - **Adding a new bounded context** — create `src/{Context}/Domain/`, `Application/Command/`, `Application/Query/`, `Infrastructure/Action/`. Bind repository interfaces in `config/container.php`.
@@ -259,8 +269,8 @@ No linter, formatter, or pre-commit hooks are configured.
 - **Twig auto-escapes** HTML by default — safer than raw PHP views. Use `|raw` only for trusted content.
 - **Repositories use raw SQL** via Cycle DBAL (not the Cycle ORM query builder). Queries are parameterized.
 - **FrankenPHP worker mode** — the app boots once. All services (repositories, handlers, actions) are stateless singletons safe for reuse across requests. Avoid storing request-scoped state in static properties or global variables.
-- **Worker-mode DB reconnect** — the worker loop pings MySQL before each request and reconnects on failure (guards against idle timeout drops). The MySQL driver is configured with `reconnect: true`.
-- **No ORM identity map** — repositories use raw DBAL queries, not the Cycle ORM entity manager. This avoids heap accumulation across worker requests.
+- **SQLite in worker mode** — SQLite uses a local file, so there are no idle TCP connection drops. The Cycle DBAL driver is configured with `reconnect: true` as a safety net. No health-check ping is needed in the worker loop.
+- **No ORM** — repositories use raw DBAL queries, not the Cycle ORM entity manager. Only `cycle/database` is installed. This avoids heap accumulation across worker requests.
 - **DaisyUI components** — use DaisyUI class names (`card`, `table`, `btn`, `badge`, etc.) in templates. Refer to https://daisyui.com/components/.
 - **Alpine.js** — used for client-side interactivity (chart init, toast auto-dismiss). Directives like `x-data`, `x-init`, `x-show` are in Twig templates.
 - **PHP 8.5 features** — use pipe operator (`|>`) for chained data transforms, `#[\NoDiscard]` for methods whose results must be consumed, `readonly` classes for immutable value objects and entities, and `static` closures in DI definitions for worker safety.
