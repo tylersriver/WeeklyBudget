@@ -1,2 +1,19 @@
+/.idea/
+/.vscode/
 
-\.idea/
+# Dependencies
+/vendor/
+
+# Environment
+.env
+
+# Runtime
+/var/cache/
+/var/log/
+
+# Tailwind build output (regenerated from source)
+/public/css/app.css
+
+# OS
+.DS_Store
+Thumbs.db

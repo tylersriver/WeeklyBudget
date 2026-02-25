@@ -1,0 +1,144 @@
+{% extends "layout.html.twig" %}
+
+{% block title %}Dashboard — WeeklyBudget{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    {# ── Budget summary cards ── #}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {# Weekly #}
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title">Weekly Budget</h2>
+                <p class="text-3xl font-bold">${{ weeklyRemaining|number_format(2) }}
+                    <span class="text-base font-normal opacity-70">remaining</span>
+                </p>
+                <p class="text-sm opacity-70">
+                    ${{ weeklySpent|number_format(2) }} of ${{ weeklyBudget|number_format(2) }} spent
+                </p>
+                {% set weeklyPct = weeklyBudget > 0 ? (weeklySpent / weeklyBudget * 100)|round : 0 %}
+                <progress class="progress progress-primary w-full"
+                          value="{{ weeklyPct }}" max="100"></progress>
+            </div>
+        </div>
+
+        {# Monthly #}
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title">Monthly Budget</h2>
+                <p class="text-3xl font-bold">${{ monthlyRemaining|number_format(2) }}
+                    <span class="text-base font-normal opacity-70">remaining</span>
+                </p>
+                <p class="text-sm opacity-70">
+                    ${{ monthlySpent|number_format(2) }} of ${{ monthlyBudget|number_format(2) }} spent
+                </p>
+                {% set monthlyPct = monthlyBudget > 0 ? (monthlySpent / monthlyBudget * 100)|round : 0 %}
+                <progress class="progress progress-secondary w-full"
+                          value="{{ monthlyPct }}" max="100"></progress>
+            </div>
+        </div>
+    </div>
+
+    {# ── Spending by category chart ── #}
+    {% if categories|length > 0 %}
+    <div class="card bg-base-100 shadow-xl" x-data x-init="
+        new Chart(document.getElementById('categoryChart'), {
+            type: 'doughnut',
+            data: {
+                labels: {{ categories|json_encode|raw }},
+                datasets: [{
+                    data: {{ categoryTotals|json_encode|raw }},
+                    backgroundColor: ['#f87171','#fb923c','#facc15','#4ade80','#60a5fa','#a78bfa'],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { position: 'bottom' } }
+            }
+        })
+    ">
+        <div class="card-body">
+            <h2 class="card-title">Spending by Category</h2>
+            <div class="flex justify-center">
+                <canvas id="categoryChart" class="max-h-64 max-w-xs"></canvas>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {# ── Add transaction form ── #}
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title">Add Transaction</h2>
+            <form method="POST" action="{{ url_for('transactions.store') }}"
+                  class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+                <div class="form-control">
+                    <label class="label"><span class="label-text">Type</span></label>
+                    <select name="type" class="select select-bordered w-full" required>
+                        <option disabled selected value="">Pick one</option>
+                        {% for t in transactionTypes %}
+                            <option value="{{ t.value }}">{{ t.value }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-control">
+                    <label class="label"><span class="label-text">Description</span></label>
+                    <input name="description" type="text" placeholder="Description"
+                           class="input input-bordered w-full" required />
+                </div>
+                <div class="form-control">
+                    <label class="label"><span class="label-text">Amount</span></label>
+                    <input name="amount" type="number" step="0.01" min="0.01" placeholder="0.00"
+                           class="input input-bordered w-full" required />
+                </div>
+                <div class="form-control">
+                    <label class="label"><span class="label-text">Date</span></label>
+                    <input name="date" type="date" value="{{ "now"|date("Y-m-d") }}"
+                           class="input input-bordered w-full" required />
+                </div>
+                <button type="submit" class="btn btn-primary">Add</button>
+            </form>
+        </div>
+    </div>
+
+    {# ── This week's transactions ── #}
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title">This Week's Transactions</h2>
+            <div class="overflow-x-auto">
+                <table class="table table-zebra">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for txn in transactions %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>{{ txn.date }}</td>
+                            <td><span class="badge badge-outline">{{ txn.type }}</span></td>
+                            <td>{{ txn.description }}</td>
+                            <td>${{ txn.amount|number_format(2) }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center opacity-50 py-8">
+                                No transactions this week
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

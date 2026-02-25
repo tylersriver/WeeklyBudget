@@ -2,114 +2,160 @@
 
 ## Project Overview
 
-WeeklyBudget is a PHP web application for tracking personal weekly and monthly budget transactions. Users can add expenses, view spending summaries with progress bars, browse transaction history by month, and update budget limits.
+WeeklyBudget is a PHP web application for tracking personal weekly and monthly budget transactions. Users can add expenses, view spending summaries with progress bars and charts, browse transaction history by month, and update budget limits.
 
 ## Tech Stack
 
-- **Language**: PHP (procedural + OOP, no framework)
-- **Database**: MySQL via MySQLi with parameterized queries
-- **Frontend**: Bootstrap 4.0.0, jQuery 3.2.1, Popper.js 1.12.9 (all CDN)
-- **Custom CSS**: `styles/global-styles.css`
-- **No package manager** (no Composer, no npm)
-- **No build step** — PHP files are served directly by a web server
+- **Language**: PHP 8.3+ (strict types, enums, named arguments, constructor promotion)
+- **Framework**: Slim 4 (PSR-7 / PSR-15 micro-framework)
+- **Runtime**: FrankenPHP (worker mode for persistent-process performance)
+- **ORM**: Cycle ORM v2 (annotated entities, DataMapper pattern)
+- **Database**: MySQL 8 via Cycle DBAL
+- **Templating**: Twig 3 via `slim/twig-view`
+- **DI Container**: PHP-DI 7 (PSR-11, autowiring enabled)
+- **Frontend**: Tailwind CSS v4 + DaisyUI 5 (CDN), Alpine.js 3, Chart.js 4
+- **Environment**: `vlucas/phpdotenv` — credentials in `.env` (never committed)
+- **Autoloading**: PSR-4 via Composer (`App\` → `src/`)
 
 ## Directory Structure
 
 ```
 WeeklyBudget/
-├── index.php                          # Entry point — loads models, resolves controller/action from query string
-├── routes.php                         # Router — dispatches to controller methods, validates allowed routes
+├── public/
+│   └── index.php                    # Front controller + FrankenPHP worker loop
+├── config/
+│   ├── container.php                # PHP-DI service definitions
+│   ├── routes.php                   # Slim route registration
+│   ├── middleware.php               # Middleware stack (body parsing, routing, Twig, errors)
+│   └── settings.php                 # App settings (reads .env)
+├── src/
+│   ├── Action/                      # Route handlers (thin controllers)
+│   │   ├── DashboardAction.php      # GET /
+│   │   ├── HistoryAction.php        # GET|POST /history
+│   │   ├── BudgetAction.php         # GET|POST /budgets
+│   │   └── TransactionAction.php    # POST /transactions
+│   ├── Entity/                      # Cycle ORM entities
+│   │   ├── Transaction.php
+│   │   └── Budget.php
+│   ├── Repository/                  # Query logic
+│   │   ├── TransactionRepository.php
+│   │   └── BudgetRepository.php
+│   └── Enum/
+│       ├── TransactionType.php      # Food, Groceries, Gas, Shopping, Other
+│       └── BudgetType.php           # Weekly, Monthly
+├── templates/
+│   ├── layout.html.twig             # Base layout (navbar, dark mode, CDN scripts)
+│   ├── dashboard.html.twig          # Budget cards, chart, transaction form, weekly table
+│   ├── history.html.twig            # Month/year filter + transaction table
+│   └── budgets.html.twig            # Budget table + update form
+├── resources/
+│   └── input.css                    # Tailwind source (for standalone CLI builds)
 ├── Schema/
-│   └── weeklyBudget.sql              # MySQL schema (transactions + budgets tables)
-├── php/
-│   ├── controllers/
-│   │   ├── pages.controller.php      # PagesController — overview, monthHistory, budgets, error
-│   │   ├── transactions.controller.php # TransactionsController — insert
-│   │   └── budgets.controller.php    # BudgetsController — update
-│   ├── models/
-│   │   ├── SimpleSQL.php             # DB connection singleton + query() function with auto param binding
-│   │   ├── SimpleORM.php             # Generic ORM base class (Get, GetList, Add, Update, Delete, etc.)
-│   │   └── BudgetDB.php             # Domain ORM — extends SimpleORM with budget/transaction queries
-│   ├── viewmodels/
-│   │   └── transactions.viewmodel.php # TransactionsViewModel — builds SimpleTable objects for views
-│   ├── views/
-│   │   ├── layout.php               # Main HTML layout (navbar, footer, CDN includes)
-│   │   └── pages/
-│   │       ├── overview.php         # Dashboard — budget progress bars + transaction form + weekly table
-│   │       ├── history.php          # Month/year transaction history filter
-│   │       ├── budgets.php          # View/update budget limits
-│   │       └── error.php            # Error page
-│   └── lib/
-│       └── SimpleTable.php          # Bootstrap HTML table generator + BootStrapTableClasses enum
-├── styles/
-│   └── global-styles.css            # Custom styles
-└── .vscode/
-    └── launch.json                  # XDebug config (port 9000)
+│   └── weeklyBudget.sql             # MySQL schema + seed data
+├── var/
+│   ├── cache/                       # Twig compiled templates (production)
+│   └── log/
+├── .env.example                     # Environment template
+├── composer.json
+├── tailwind.config.js               # Tailwind / DaisyUI config
+├── Dockerfile                       # FrankenPHP production image
+├── docker-compose.yml               # App + MySQL services
+└── CLAUDE.md
 ```
 
 ## Architecture & Request Flow
 
-1. `index.php` — includes all models, reads `controller` and `action` from `$_GET`, defaults to `pages`/`overview`
-2. `routes.php` — whitelist of valid controller/action pairs, calls `call($controller, $action)`
-3. Controller method — fetches data via `BudgetDB` static methods, sets view variables, then `require_once` the view
-4. View — renders HTML with inline PHP using the variables set by the controller
+1. `public/index.php` — loads `.env`, builds DI container, creates Slim app, registers middleware + routes
+2. In FrankenPHP worker mode, the app boots **once** then handles requests in a `frankenphp_handle_request()` loop
+3. Slim routes dispatch to Action classes (invokable or method-based)
+4. Actions inject repositories via constructor (PHP-DI autowiring) and render Twig templates
+5. Repositories use `Cycle\Database\DatabaseManager` for raw SQL queries against MySQL
 
-Routing is query-string based: `?controller=pages&action=budgets`. Forms use POST for data, GET params for routing.
+### Routes
 
-## Key Classes
+| Method | Path            | Action                        | Name               |
+|--------|-----------------|-------------------------------|---------------------|
+| GET    | `/`             | `DashboardAction::__invoke`   | `dashboard`         |
+| GET    | `/history`      | `HistoryAction::index`        | `history`           |
+| POST   | `/history`      | `HistoryAction::filter`       | `history.filter`    |
+| GET    | `/budgets`      | `BudgetAction::index`         | `budgets`           |
+| POST   | `/budgets`      | `BudgetAction::update`        | `budgets.update`    |
+| POST   | `/transactions` | `TransactionAction::__invoke` | `transactions.store`|
 
-### SimpleSQL (`php/models/SimpleSQL.php`)
-- Singleton MySQL connection (`SimpleSQL::getInstance()`)
-- Global `query($sql, $params)` function — handles prepared statements with auto type detection
-- Helper functions: `makeValuesReferenced()`, `buildTypeStringFromArray()`
+## Key Components
 
-### SimpleORM (`php/models/SimpleORM.php`)
-- Abstract base with static CRUD: `Get($id)`, `GetList($where)`, `GetOne($where)`, `Add($values)`, `Update($id, $set)`, `UpdateMany($set, $where)`, `Delete($id)`, `DeleteMany($where)`
-- Subclasses define `$table`, `$key`, `$fields` as protected static properties
+### Entities (`src/Entity/`)
+Cycle ORM annotated entities with `#[Entity]` and `#[Column]` attributes. Map directly to the existing `transactions` and `budgets` MySQL tables.
 
-### BudgetDB (`php/models/BudgetDB.php`)
-- Extends SimpleORM for the `transactions` table
-- Domain methods: `getWeeklySpent()`, `getMonthlySpent()`, `getRemaining($type)`, `getBudgetSetting($type)`, `getTransactionsThisWeek()`, `getTransactionsForMonth($year, $month)`, `getCurrentBudgets()`, `getYearsForTransactions()`, `setBudget($type, $amount)`, `insertTransaction($type, $description, $amount, $date)`
+### Repositories (`src/Repository/`)
+- **TransactionRepository** — `getWeeklySpent()`, `getMonthlySpent()`, `getTransactionsThisWeek()`, `getTransactionsForMonth()`, `getYearsForTransactions()`, `getMonthlySpendingByCategory()`, `insert()`
+- **BudgetRepository** — `getBudgetSetting()`, `getAll()`, `update()`
 
-### SimpleTable (`php/lib/SimpleTable.php`)
-- Generates Bootstrap `<table>` HTML from associative arrays
-- Supports table classes via `BootStrapTableClasses` constants (Striped, Bordered, Hover, Small, Dark)
-- Auto-detects column headers from the first data row
+Both inject `DatabaseManager` and use raw SQL via `$this->dbal->database()->query(...)`.
+
+### Enums (`src/Enum/`)
+- `TransactionType` — backed string enum: Food, Groceries, Gas, Shopping, Other
+- `BudgetType` — backed string enum: weekly, monthly
+
+### Actions (`src/Action/`)
+Thin controllers that inject `Twig` + repositories. Return `$this->view->render(...)` responses. `TransactionAction` does a POST-redirect-GET to the dashboard.
 
 ## Database Schema
 
 **Database**: `WeeklyBudget`
 
-**Table `Transactions`**: `id` (int PK auto), `dateAdded` (date), `type` (text), `description` (text), `amount` (decimal 4,2)
+**Table `transactions`**: `id` (int PK auto), `dateAdded` (date), `type` (text), `description` (text), `amount` (decimal 4,2)
 
-**Table `budgets`**: `id` (int PK auto), `budgetType` (text), `amount` (int) — seeded with weekly=$200, monthly=$800
+**Table `budgets`**: `id` (int PK auto), `budgetType` (text), `amount` (int) — seeded with weekly=200, monthly=800
 
 Schema file: `Schema/weeklyBudget.sql`
 
 ## Code Conventions
 
-- **Class names**: PascalCase (`BudgetDB`, `SimpleTable`, `PagesController`)
-- **Methods**: camelCase (`getWeeklySpent`, `insertTransaction`)
-- **Controllers**: `{name}.controller.php` — class named `{Name}Controller`
-- **Models**: PascalCase filenames matching class names
-- **Views**: lowercase filenames in `php/views/pages/`
-- **Static methods** for all ORM/database operations
-- **Ternary operators** for null/default handling on `$_POST`/`$_GET` values
-- **PHPDoc blocks** on all public methods
-- **No namespaces** — files loaded via `require_once`
+- **Strict types** declared in every PHP file
+- **PSR-4** namespacing: `App\Action`, `App\Entity`, `App\Repository`, `App\Enum`
+- **Class names**: PascalCase (`DashboardAction`, `TransactionRepository`)
+- **Methods**: camelCase (`getWeeklySpent`, `insert`)
+- **Constructor promotion** for dependency injection
+- **Backed enums** for type-safe domain values
+- **PHPDoc blocks** on all public repository methods
+- **Twig templates**: `*.html.twig` with DaisyUI component classes
+- **No `echo`/`print`** — all output via Twig rendering
 
 ## Build & Run
 
-No build step. Requirements:
-- PHP 5.4+ with MySQLi extension
-- MySQL server
-- Web server (Apache/Nginx) pointed at the project root
+### Docker (recommended)
 
-Setup:
-1. Import `Schema/weeklyBudget.sql` into MySQL
-2. Configure DB credentials in `php/models/SimpleSQL.php` (hardcoded)
-3. Point web server document root to the project directory
-4. Access via browser at the web server URL
+```bash
+cp .env.example .env    # edit credentials if needed
+docker compose up       # app at http://localhost:8080
+```
+
+The MySQL container auto-imports `Schema/weeklyBudget.sql` on first run.
+
+### Local development
+
+Requirements: PHP 8.2+ with pdo_mysql, MySQL server, Composer
+
+```bash
+composer install
+cp .env.example .env
+# Edit .env with your local DB credentials
+php -S localhost:8080 -t public
+```
+
+### Tailwind CSS (production build)
+
+Templates use CDN for development. For production:
+
+```bash
+# Download standalone CLI
+curl -sLO https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-linux-x64
+chmod +x tailwindcss-linux-x64
+
+# Build
+./tailwindcss-linux-x64 -i resources/input.css -o public/css/app.css --minify
+```
 
 ## Testing
 
@@ -121,11 +167,12 @@ No linter, formatter, or pre-commit hooks are configured.
 
 ## Important Notes for AI Assistants
 
-- **No dependency manager**: There is no `composer.json` or `package.json`. All PHP is vanilla; frontend libs are CDN-linked.
-- **Database credentials are hardcoded** in `SimpleSQL.php`. Do not commit real credentials.
-- **No autoloading**: All files are loaded via explicit `require_once` chains starting from `index.php`. When adding new files, add corresponding `require_once` statements.
-- **No input validation layer**: SQL injection is mitigated by parameterized queries in `query()`, but there is no HTML escaping or CSRF protection. Be mindful when outputting user data in views.
-- **The `query()` function** is global (not a class method) and is the sole interface for all DB queries.
-- **SimpleORM uses late static binding** (`static::$table`, `static::$key`) — subclasses must define these protected static properties.
-- **Views use variables set directly by controllers** — there is no template engine. Variables are in-scope because controllers `require_once` the view file after setting them.
-- **Routing whitelist** in `routes.php` — new controller actions must be registered in the `$controllers` array.
+- **Dependencies managed via Composer** — run `composer install` after cloning. No npm required (frontend is CDN).
+- **Database credentials** are in `.env` (git-ignored). Never commit `.env`. Use `.env.example` as template.
+- **PSR-4 autoloading** — no `require_once` needed. Add new classes under `src/` with correct namespace.
+- **Adding routes** — register in `config/routes.php`, create corresponding Action class in `src/Action/`.
+- **Twig auto-escapes** HTML by default — safer than raw PHP views. Use `|raw` only for trusted content.
+- **Repositories use raw SQL** via Cycle DBAL (not the Cycle ORM query builder) for compatibility with the existing schema. Queries are parameterized.
+- **FrankenPHP worker mode** — the app boots once. Avoid storing request-scoped state in static properties or global variables.
+- **DaisyUI components** — use DaisyUI class names (`card`, `table`, `btn`, `badge`, etc.) in templates. Refer to https://daisyui.com/components/.
+- **Alpine.js** — used for client-side interactivity (chart init, toast auto-dismiss). Directives like `x-data`, `x-init`, `x-show` are in Twig templates.

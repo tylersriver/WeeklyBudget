@@ -1,0 +1,88 @@
+{% extends "layout.html.twig" %}
+
+{% block title %}History — WeeklyBudget{% endblock %}
+
+{% set months = {
+    1: 'January', 2: 'February', 3: 'March', 4: 'April',
+    5: 'May', 6: 'June', 7: 'July', 8: 'August',
+    9: 'September', 10: 'October', 11: 'November', 12: 'December'
+} %}
+
+{% block content %}
+<div class="space-y-6">
+
+    {# ── Filter form ── #}
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title">View History</h2>
+            <form method="POST" action="{{ url_for('history.filter') }}"
+                  class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                <div class="form-control">
+                    <label class="label"><span class="label-text">Month</span></label>
+                    <select name="month" class="select select-bordered w-full">
+                        {% for num, name in months %}
+                            <option value="{{ num }}" {{ num == selectedMonth ? 'selected' : '' }}>
+                                {{ name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-control">
+                    <label class="label"><span class="label-text">Year</span></label>
+                    <select name="year" class="select select-bordered w-full">
+                        {% for y in years %}
+                            <option value="{{ y }}" {{ y == selectedYear ? 'selected' : '' }}>
+                                {{ y }}
+                            </option>
+                        {% endfor %}
+                        {% if years is empty %}
+                            <option value="{{ "now"|date("Y") }}" selected>{{ "now"|date("Y") }}</option>
+                        {% endif %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">View</button>
+            </form>
+        </div>
+    </div>
+
+    {# ── Transaction table ── #}
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title">
+                {{ months[selectedMonth] }} {{ selectedYear }} Transactions
+            </h2>
+            <div class="overflow-x-auto">
+                <table class="table table-zebra">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for txn in transactions %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>{{ txn.date }}</td>
+                            <td><span class="badge badge-outline">{{ txn.type }}</span></td>
+                            <td>{{ txn.description }}</td>
+                            <td>${{ txn.amount|number_format(2) }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center opacity-50 py-8">
+                                No transactions for this period
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
