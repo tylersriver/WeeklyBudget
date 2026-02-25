@@ -16,12 +16,13 @@ RUN composer install --no-dev --optimize-autoloader --no-scripts --ignore-platfo
 # Copy source code
 COPY . .
 
-# Ensure runtime directories exist and initialise SQLite database
-RUN mkdir -p var/cache var/log var/data \
-    && sqlite3 var/data/weeklybudget.sqlite < Schema/weeklyBudget.sql
+# Ensure runtime directories exist
+RUN mkdir -p var/cache var/log var/data
 
-# Plain HTTP for local development (override SERVER_NAME for production)
-ENV SERVER_NAME=":80"
+# Worker mode configuration
 ENV FRANKENPHP_CONFIG="worker ./public/index.php"
 
 EXPOSE 80
+
+# Entrypoint handles dynamic PORT binding (Railway) and SQLite init
+ENTRYPOINT ["./docker-entrypoint.sh"]

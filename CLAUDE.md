@@ -98,7 +98,8 @@ WeeklyBudget/
 ├── composer.json
 ├── tailwind.config.js                             # Tailwind / DaisyUI config
 ├── Dockerfile                                     # FrankenPHP production image
-├── docker-compose.yml                             # App service with SQLite volume
+├── docker-entrypoint.sh                           # Entrypoint — PORT binding + SQLite init
+├── compose.yml                                    # Local dev (Docker Compose)
 └── CLAUDE.md
 ```
 
@@ -215,7 +216,7 @@ cp .env.example .env    # edit credentials if needed
 docker compose up       # app at http://localhost:8080
 ```
 
-The Dockerfile initialises the SQLite database from `Schema/weeklyBudget.sql` during build.
+The entrypoint script initialises the SQLite database from `Schema/weeklyBudget.sql` on first run.
 
 ### Local development
 
@@ -228,6 +229,10 @@ mkdir -p var/data
 sqlite3 var/data/weeklybudget.sqlite < Schema/weeklyBudget.sql
 php -S localhost:8080 -t public
 ```
+
+### Railway deployment
+
+Railway auto-detects the Dockerfile. Attach a volume mounted at `/app/var/data` to persist the SQLite database across deploys. The entrypoint script reads Railway's dynamic `PORT` env var and initialises the database on first boot.
 
 ### Tailwind CSS (production build)
 
@@ -270,6 +275,7 @@ CI runs all three via GitHub Actions on PRs to master.
 - **Repositories use raw SQL** via Cycle DBAL (not the Cycle ORM query builder). Queries are parameterized.
 - **FrankenPHP worker mode** — the app boots once. All services (repositories, handlers, actions) are stateless singletons safe for reuse across requests. Avoid storing request-scoped state in static properties or global variables.
 - **SQLite in worker mode** — SQLite uses a local file, so there are no idle TCP connection drops. The Cycle DBAL driver is configured with `reconnect: true` as a safety net. No health-check ping is needed in the worker loop.
+- **Railway deployment** — the `docker-entrypoint.sh` binds FrankenPHP to `$PORT` (Railway-injected) and initialises the SQLite database at runtime (Railway volumes aren't mounted at build time). Attach a volume at `/app/var/data` in Railway's dashboard.
 - **No ORM** — repositories use raw DBAL queries, not the Cycle ORM entity manager. Only `cycle/database` is installed. This avoids heap accumulation across worker requests.
 - **DaisyUI components** — use DaisyUI class names (`card`, `table`, `btn`, `badge`, etc.) in templates. Refer to https://daisyui.com/components/.
 - **Alpine.js** — used for client-side interactivity (chart init, toast auto-dismiss). Directives like `x-data`, `x-init`, `x-show` are in Twig templates.
