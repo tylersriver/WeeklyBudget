@@ -30,8 +30,12 @@ WeeklyBudget/
 │   └── settings.php                               # App settings (reads .env)
 ├── src/
 │   ├── Shared/
-│   │   └── Domain/
-│   │       └── AggregateRoot.php                  # Abstract base — identity + equality
+│   │   ├── Domain/
+│   │   │   └── AggregateRoot.php                  # Abstract base — identity + equality
+│   │   ├── Application/
+│   │   │   └── CommandBusInterface.php            # Port — dispatch commands to handlers
+│   │   └── Infrastructure/
+│   │       └── ContainerCommandBus.php            # Adapter — resolves handlers from DI container
 │   ├── Budget/
 │   │   ├── Domain/
 │   │   │   ├── Budget.php                         # Aggregate Root — invariants, remaining(), percentUsed()
@@ -111,11 +115,12 @@ Each bounded context (`Budget/`, `Transaction/`, `Reporting/`) follows three lay
 
 1. `public/index.php` — boots container (once in worker mode), creates Slim app
 2. Slim routes dispatch to **Infrastructure Actions** (HTTP adapters)
-3. Actions create **Command DTOs** or invoke **Query handlers**
-4. **Command handlers** build Aggregate Roots via domain factories, call repository ports
-5. **Query handlers** call repository ports, assemble DTOs
-6. **Infrastructure repositories** (adapters) execute raw SQL via Cycle DBAL
-7. Actions render Twig templates with query results
+3. Actions dispatch **Command DTOs** via the **Command Bus** or invoke **Query handlers** directly
+4. **Command Bus** resolves the handler from the DI container (convention: `{Name}Command` → `{Name}Handler`)
+5. **Command handlers** build Aggregate Roots via domain factories, call repository ports
+6. **Query handlers** call repository ports, assemble DTOs
+7. **Infrastructure repositories** (adapters) execute raw SQL via Cycle DBAL
+8. Actions render Twig templates with query results
 
 ### CQRS Pattern
 
@@ -123,7 +128,7 @@ Each bounded context (`Budget/`, `Transaction/`, `Reporting/`) follows three lay
 
 **Queries** (read side): `GetDashboardQuery`, `GetAllBudgetsQuery`, `GetBudgetByTypeQuery`, `GetWeeklyTransactionsQuery`, `GetMonthlyTransactionsQuery`
 
-Command DTOs are `readonly class`es. Handlers are `__invoke()`-able. No message bus — handlers are injected directly.
+Command DTOs are `readonly class`es. Handlers are `__invoke()`-able. Commands are dispatched via `CommandBusInterface` — a port implemented by `ContainerCommandBus`, which resolves handlers from the DI container using a naming convention (`{Name}Command` → `{Name}Handler` in the same namespace). HTTP actions depend only on the bus abstraction, not concrete handlers.
 
 ### Bounded Contexts
 

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Transaction\Infrastructure\Action;
 
+use App\Shared\Application\CommandBusInterface;
 use App\Transaction\Application\Command\RecordTransactionCommand;
-use App\Transaction\Application\Command\RecordTransactionHandler;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Routing\RouteContext;
@@ -13,7 +13,7 @@ use Slim\Routing\RouteContext;
 final class TransactionAction
 {
     public function __construct(
-        private readonly RecordTransactionHandler $recordTransaction,
+        private readonly CommandBusInterface $commandBus,
     ) {}
 
     public function __invoke(Request $request, Response $response): Response
@@ -26,7 +26,7 @@ final class TransactionAction
         $date        = $body['date']        ?? date('Y-m-d');
 
         if ($type !== '' && $description !== '') {
-            ($this->recordTransaction)(new RecordTransactionCommand(
+            $this->commandBus->dispatch(new RecordTransactionCommand(
                 type:        $type,
                 description: $description,
                 amount:      $amount,
