@@ -27,6 +27,11 @@ $builder->addDefinitions([
 
     DatabaseManager::class => static function (ContainerInterface $c): DatabaseManager {
         $db = $c->get('settings')['db'];
+
+        // Run idempotent migrations (adds new tables/columns to existing DBs)
+        $migrate = require __DIR__ . '/../Schema/migrate.php';
+        $migrate(new \PDO('sqlite:' . $db['path']));
+
         return new DatabaseManager(new DatabaseConfig([
             'default'     => 'default',
             'databases'   => [
