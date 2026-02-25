@@ -3,6 +3,12 @@ FROM dunglas/frankenphp:1-php8.5-bookworm
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
 
+# Install system dependencies required by Composer and SQLite
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    unzip \
+    sqlite3 \
+    && rm -rf /var/lib/apt/lists/*
+
 # Install PHP extensions for SQLite
 RUN install-php-extensions pdo_sqlite
 
