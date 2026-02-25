@@ -10,7 +10,8 @@ WORKDIR /app
 
 # Install dependencies first (leverages Docker cache)
 COPY composer.json composer.lock ./
-RUN composer install --no-dev --optimize-autoloader --no-scripts
+# PHP 8.5 is new — many packages lack explicit 8.5 platform declarations yet
+RUN composer install --no-dev --optimize-autoloader --no-scripts --ignore-platform-reqs
 
 # Copy source code
 COPY . .
