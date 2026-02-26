@@ -108,7 +108,8 @@
     </div>
 
     {# ── Expenses Section (Tabbed) ── #}
-    <div class="card bg-base-100 shadow-xl" x-data="{ tab: 'Bills' }">
+    <div id="expenses" class="card bg-base-100 shadow-xl"
+         x-data="{ tab: new URLSearchParams(window.location.search).get('tab') || 'Bills' }">
         <div class="card-body">
             <h2 class="card-title">Monthly Expenses</h2>
 
@@ -160,6 +161,7 @@
                                     <td>
                                         <form method="POST" action="{{ url_for('estimator.expense.delete') }}" class="inline">
                                             <input type="hidden" name="id" value="{{ expense.id }}">
+                                            <input type="hidden" name="category" value="{{ cat.value }}">
                                             <button type="submit" class="btn btn-ghost btn-xs text-error">Remove</button>
                                         </form>
                                     </td>
