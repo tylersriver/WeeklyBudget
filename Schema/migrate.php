@@ -25,7 +25,7 @@ return static function (\PDO $pdo): void {
     $pdo->exec(<<<'SQL'
         CREATE TABLE IF NOT EXISTS categories (
             id   INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL UNIQUE
+            name TEXT NOT NULL
         )
     SQL);
 
@@ -64,6 +64,31 @@ return static function (\PDO $pdo): void {
             category TEXT NOT NULL
         )
     SQL);
+
+    // ── Remove stale UNIQUE constraint on categories.name (now scoped per user) ──
+    $indexes = $pdo->query("PRAGMA index_list(categories)")->fetchAll(\PDO::FETCH_ASSOC);
+    foreach ($indexes as $idx) {
+        if ((int) $idx['unique'] === 1 && $idx['origin'] !== 'pk') {
+            // Check if this unique index is on the 'name' column alone
+            $idxInfo = $pdo->query("PRAGMA index_info({$idx['name']})")->fetchAll(\PDO::FETCH_ASSOC);
+            if (count($idxInfo) === 1 && $idxInfo[0]['name'] === 'name') {
+                // Rebuild table without the UNIQUE constraint
+                $pdo->exec('BEGIN TRANSACTION');
+                $pdo->exec('ALTER TABLE categories RENAME TO categories_old');
+                $pdo->exec(<<<'SQL'
+                    CREATE TABLE categories (
+                        id      INTEGER PRIMARY KEY AUTOINCREMENT,
+                        user_id INTEGER NOT NULL DEFAULT 1,
+                        name    TEXT NOT NULL
+                    )
+                SQL);
+                $pdo->exec('INSERT INTO categories (id, user_id, name) SELECT id, user_id, name FROM categories_old');
+                $pdo->exec('DROP TABLE categories_old');
+                $pdo->exec('COMMIT');
+                break;
+            }
+        }
+    }
 
     // ── Add user_id to all data tables (migration for existing databases) ──
     if (!$hasBudgetUserId) {
