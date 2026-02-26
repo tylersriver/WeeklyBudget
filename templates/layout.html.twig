@@ -40,10 +40,11 @@
                 </div>
 
                 <div class="flex-1">
-                    <a href="{{ url_for('dashboard') }}" class="btn btn-ghost text-xl font-bold">WeeklyBudget</a>
+                    <a href="{{ authUser.id ? url_for('dashboard') : url_for('landing') }}" class="btn btn-ghost text-xl font-bold">WeeklyBudget</a>
                 </div>
 
                 {# Desktop nav links — hidden on mobile #}
+                {% if authUser.id %}
                 <div class="hidden lg:flex">
                     <ul class="menu menu-horizontal px-1 gap-1">
                         <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
@@ -51,6 +52,20 @@
                         <li><a href="{{ url_for('budgets') }}">Budgets</a></li>
                         <li><a href="{{ url_for('estimator') }}">Estimator</a></li>
                     </ul>
+                </div>
+                {% endif %}
+
+                {# User menu / auth links #}
+                <div class="flex-none hidden lg:flex items-center gap-2">
+                    {% if authUser.id %}
+                        <span class="text-sm opacity-70">{{ authUser.email }}</span>
+                        <form method="post" action="{{ url_for('logout') }}" class="inline">
+                            <button type="submit" class="btn btn-ghost btn-sm">Logout</button>
+                        </form>
+                    {% else %}
+                        <a href="{{ url_for('login') }}" class="btn btn-ghost btn-sm">Login</a>
+                        <a href="{{ url_for('register') }}" class="btn btn-primary btn-sm">Register</a>
+                    {% endif %}
                 </div>
 
                 {# Dark / light toggle #}
@@ -94,10 +109,23 @@
             <label for="nav-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
             <ul class="menu bg-base-200 min-h-full w-64 p-4 text-base-content">
                 <li class="menu-title text-lg font-bold mb-2">WeeklyBudget</li>
-                <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
-                <li><a href="{{ url_for('history') }}">History</a></li>
-                <li><a href="{{ url_for('budgets') }}">Budgets</a></li>
-                <li><a href="{{ url_for('estimator') }}">Estimator</a></li>
+                {% if authUser.id %}
+                    <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                    <li><a href="{{ url_for('history') }}">History</a></li>
+                    <li><a href="{{ url_for('budgets') }}">Budgets</a></li>
+                    <li><a href="{{ url_for('estimator') }}">Estimator</a></li>
+                    <li class="mt-4 border-t border-base-300 pt-4">
+                        <span class="text-xs opacity-60">{{ authUser.email }}</span>
+                    </li>
+                    <li>
+                        <form method="post" action="{{ url_for('logout') }}">
+                            <button type="submit" class="w-full text-left">Logout</button>
+                        </form>
+                    </li>
+                {% else %}
+                    <li><a href="{{ url_for('login') }}">Login</a></li>
+                    <li><a href="{{ url_for('register') }}">Register</a></li>
+                {% endif %}
             </ul>
         </div>
 

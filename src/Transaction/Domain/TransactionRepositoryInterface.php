@@ -8,35 +8,35 @@ use App\Budget\Domain\MoneyAmount;
 
 interface TransactionRepositoryInterface
 {
-    public function save(Transaction $transaction): void;
+    public function save(Transaction $transaction, int $userId): void;
 
     #[\NoDiscard]
-    public function weeklySpent(): MoneyAmount;
+    public function weeklySpent(int $userId): MoneyAmount;
 
     #[\NoDiscard]
-    public function monthlySpent(): MoneyAmount;
-
-    /**
-     * @return array<int, array<string, mixed>>
-     */
-    #[\NoDiscard]
-    public function transactionsThisWeek(): array;
+    public function monthlySpent(int $userId): MoneyAmount;
 
     /**
      * @return array<int, array<string, mixed>>
      */
     #[\NoDiscard]
-    public function transactionsForMonth(int $year, int $month): array;
+    public function transactionsThisWeek(int $userId): array;
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    #[\NoDiscard]
+    public function transactionsForMonth(int $year, int $month, int $userId): array;
 
     /**
      * @return int[]
      */
     #[\NoDiscard]
-    public function yearsWithTransactions(): array;
+    public function yearsWithTransactions(int $userId): array;
 
     /**
      * @return array<string, float>
      */
     #[\NoDiscard]
-    public function monthlySpendingByCategory(): array;
+    public function monthlySpendingByCategory(int $userId): array;
 }

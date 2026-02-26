@@ -26,19 +26,25 @@ final class EstimatorAction
 
     public function index(Request $request, Response $response): Response
     {
-        $data = ($this->getEstimate)();
+        /** @var int $userId */
+        $userId = $request->getAttribute('userId');
+        $data = ($this->getEstimate)($userId);
 
         return $this->view->render($response, 'estimator.html.twig', $data->toTemplateVars());
     }
 
     public function addIncome(Request $request, Response $response): Response
     {
+        /** @var int $userId */
+        $userId = $request->getAttribute('userId');
+
         /** @var array<string, string> $body */
         $body = (array) $request->getParsedBody();
 
         $this->commandBus->dispatch(new AddIncomeCommand(
             name:   (string) ($body['name'] ?? ''),
             amount: (string) ($body['amount'] ?? '0'),
+            userId: $userId,
         ));
 
         return $this->redirectToEstimator($request, $response);
@@ -58,6 +64,9 @@ final class EstimatorAction
 
     public function addExpense(Request $request, Response $response): Response
     {
+        /** @var int $userId */
+        $userId = $request->getAttribute('userId');
+
         /** @var array<string, string> $body */
         $body = (array) $request->getParsedBody();
 
@@ -65,6 +74,7 @@ final class EstimatorAction
             name:     (string) ($body['name'] ?? ''),
             amount:   (string) ($body['amount'] ?? '0'),
             category: (string) ($body['category'] ?? ''),
+            userId:   $userId,
         ));
 
         return $this->redirectToEstimator($request, $response);

@@ -13,23 +13,24 @@ describe('AddIncomeHandler', function () {
         $repo->allows('addIncome')->with(
             'Salary',
             Mockery::on(fn (MoneyAmount $a) => $a->toFloat() === 3000.0),
+            1,
         )->once();
 
         $handler = new AddIncomeHandler($repo);
-        $handler(new AddIncomeCommand(name: 'Salary', amount: '3000'));
+        $handler(new AddIncomeCommand(name: 'Salary', amount: '3000', userId: 1));
     });
 
     it('rejects empty name', function () {
         $repo = Mockery::mock(EstimateRepositoryInterface::class);
         $handler = new AddIncomeHandler($repo);
 
-        $handler(new AddIncomeCommand(name: '  ', amount: '100'));
+        $handler(new AddIncomeCommand(name: '  ', amount: '100', userId: 1));
     })->throws(DomainException::class, 'Income name must not be empty.');
 
     it('rejects non-positive amount', function () {
         $repo = Mockery::mock(EstimateRepositoryInterface::class);
         $handler = new AddIncomeHandler($repo);
 
-        $handler(new AddIncomeCommand(name: 'Salary', amount: '0'));
+        $handler(new AddIncomeCommand(name: 'Salary', amount: '0', userId: 1));
     })->throws(DomainException::class, 'Income amount must be positive.');
 });

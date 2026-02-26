@@ -28,13 +28,18 @@ final class BudgetAction
 
     public function index(Request $request, Response $response): Response
     {
-        $data = ($this->getAllBudgets)();
+        /** @var int $userId */
+        $userId = $request->getAttribute('userId');
+        $data = ($this->getAllBudgets)($userId);
 
         return $this->view->render($response, 'budgets.html.twig', $data);
     }
 
     public function update(Request $request, Response $response): Response
     {
+        /** @var int $userId */
+        $userId = $request->getAttribute('userId');
+
         /** @var array<string, string> $body */
         $body   = (array) $request->getParsedBody();
         $type   = (string) ($body['type'] ?? '');
@@ -43,9 +48,10 @@ final class BudgetAction
         $success = $this->commandBus->dispatch(new UpdateBudgetCommand(
             type:   $type,
             amount: $amount,
+            userId: $userId,
         ));
 
-        $data = ($this->getAllBudgets)();
+        $data = ($this->getAllBudgets)($userId);
 
         return $this->view->render($response, 'budgets.html.twig', [
             ...$data,
@@ -55,12 +61,15 @@ final class BudgetAction
 
     public function activate(Request $request, Response $response): Response
     {
+        /** @var int $userId */
+        $userId = $request->getAttribute('userId');
+
         /** @var array<string, string> $body */
         $body = (array) $request->getParsedBody();
         $type = BudgetType::tryFrom((string) ($body['type'] ?? ''));
 
         if ($type !== null) {
-            $this->budgets->activateByType($type);
+            $this->budgets->activateByType($type, $userId);
         }
 
         return $this->redirectToBudgets($request, $response);
@@ -68,12 +77,15 @@ final class BudgetAction
 
     public function addCategory(Request $request, Response $response): Response
     {
+        /** @var int $userId */
+        $userId = $request->getAttribute('userId');
+
         /** @var array<string, string> $body */
         $body = (array) $request->getParsedBody();
         $name = trim((string) ($body['name'] ?? ''));
 
-        if ($name !== '' && !$this->categories->exists($name)) {
-            $this->categories->add($name);
+        if ($name !== '' && !$this->categories->exists($name, $userId)) {
+            $this->categories->add($name, $userId);
         }
 
         return $this->redirectToBudgets($request, $response);
@@ -81,12 +93,15 @@ final class BudgetAction
 
     public function deleteCategory(Request $request, Response $response): Response
     {
+        /** @var int $userId */
+        $userId = $request->getAttribute('userId');
+
         /** @var array<string, string> $body */
         $body = (array) $request->getParsedBody();
         $name = trim((string) ($body['name'] ?? ''));
 
         if ($name !== '') {
-            $this->categories->delete($name);
+            $this->categories->delete($name, $userId);
         }
 
         return $this->redirectToBudgets($request, $response);

@@ -16,10 +16,10 @@ describe('RecordTransactionHandler', function () {
         $repo->allows('save')->with(Mockery::on(function (Transaction $txn) use (&$saved) {
             $saved = $txn;
             return true;
-        }));
+        }), 1);
 
         $categories = Mockery::mock(CategoryRepositoryInterface::class);
-        $categories->allows('exists')->with('Food')->andReturn(true);
+        $categories->allows('exists')->with('Food', 1)->andReturn(true);
 
         $handler = new RecordTransactionHandler($repo, $categories);
         $handler(new RecordTransactionCommand(
@@ -27,6 +27,7 @@ describe('RecordTransactionHandler', function () {
             description: 'Lunch at cafe',
             amount: '15.50',
             date: '2026-02-25',
+            userId: 1,
         ));
 
         expect($saved)->not->toBeNull();
@@ -39,7 +40,7 @@ describe('RecordTransactionHandler', function () {
         $repo = Mockery::mock(TransactionRepositoryInterface::class);
 
         $categories = Mockery::mock(CategoryRepositoryInterface::class);
-        $categories->allows('exists')->with('InvalidType')->andReturn(false);
+        $categories->allows('exists')->with('InvalidType', 1)->andReturn(false);
 
         $handler = new RecordTransactionHandler($repo, $categories);
 
@@ -48,6 +49,7 @@ describe('RecordTransactionHandler', function () {
             description: 'Something',
             amount: '10.00',
             date: '2026-02-25',
+            userId: 1,
         ));
     })->throws(DomainException::class, 'Invalid category');
 
@@ -55,7 +57,7 @@ describe('RecordTransactionHandler', function () {
         $repo = Mockery::mock(TransactionRepositoryInterface::class);
 
         $categories = Mockery::mock(CategoryRepositoryInterface::class);
-        $categories->allows('exists')->with('Food')->andReturn(true);
+        $categories->allows('exists')->with('Food', 1)->andReturn(true);
 
         $handler = new RecordTransactionHandler($repo, $categories);
 
@@ -64,6 +66,7 @@ describe('RecordTransactionHandler', function () {
             description: '',
             amount: '10.00',
             date: '2026-02-25',
+            userId: 1,
         ));
     })->throws(InvalidArgumentException::class);
 });

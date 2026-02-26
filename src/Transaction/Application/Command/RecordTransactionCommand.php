@@ -11,6 +11,7 @@ readonly class RecordTransactionCommand
         public string $description,
         public string $amount,
         public string $date,
+        public int $userId,
     ) {
     }
 }

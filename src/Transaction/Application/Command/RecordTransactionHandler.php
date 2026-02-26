@@ -20,7 +20,7 @@ final class RecordTransactionHandler
 
     public function __invoke(RecordTransactionCommand $command): void
     {
-        if (!$this->categories->exists($command->type)) {
+        if (!$this->categories->exists($command->type, $command->userId)) {
             throw new \DomainException("Invalid category: {$command->type}");
         }
 
@@ -31,6 +31,6 @@ final class RecordTransactionHandler
             dateAdded: new \DateTimeImmutable($command->date),
         );
 
-        $this->transactions->save($transaction);
+        $this->transactions->save($transaction, $command->userId);
     }
 }

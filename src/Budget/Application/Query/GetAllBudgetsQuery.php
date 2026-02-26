@@ -24,12 +24,12 @@ final class GetAllBudgetsQuery
      * }
      */
     #[\NoDiscard]
-    public function __invoke(): array
+    public function __invoke(int $userId): array
     {
         return [
-            'budgets'     => $this->budgets->findAll(),
+            'budgets'     => $this->budgets->findAll($userId),
             'budgetTypes' => BudgetType::cases(),
-            'categories'  => $this->categories->findAll(),
+            'categories'  => $this->categories->findAll($userId),
         ];
     }
 }

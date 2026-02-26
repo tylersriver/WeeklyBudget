@@ -14,11 +14,14 @@ final class TransactionAction
 {
     public function __construct(
         private readonly CommandBusInterface $commandBus,
-    ) {}
+    ) {
+    }
 
     public function __invoke(Request $request, Response $response): Response
     {
-        $body = (array) $request->getParsedBody();
+        $body   = (array) $request->getParsedBody();
+        /** @var int $userId */
+        $userId = $request->getAttribute('userId');
 
         $type        = $body['type']        ?? '';
         $description = $body['description'] ?? '';
@@ -31,6 +34,7 @@ final class TransactionAction
                 description: $description,
                 amount:      $amount,
                 date:        $date,
+                userId:      $userId,
             ));
         }
 

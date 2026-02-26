@@ -15,10 +15,10 @@ final class GetEstimateQuery
     }
 
     #[\NoDiscard]
-    public function __invoke(): EstimateData
+    public function __invoke(int $userId): EstimateData
     {
         return new EstimateData(
-            estimate:          $this->estimates->find(),
+            estimate:          $this->estimates->find($userId),
             expenseCategories: ExpenseCategory::cases(),
         );
     }

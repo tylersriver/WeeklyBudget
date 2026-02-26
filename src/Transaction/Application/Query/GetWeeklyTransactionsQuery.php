@@ -19,11 +19,11 @@ final class GetWeeklyTransactionsQuery
      * @return array{transactions: array<int, array<string, mixed>>, categories: string[]}
      */
     #[\NoDiscard]
-    public function __invoke(): array
+    public function __invoke(int $userId): array
     {
         return [
-            'transactions' => $this->transactions->transactionsThisWeek(),
-            'categories'   => $this->categories->findAll(),
+            'transactions' => $this->transactions->transactionsThisWeek($userId),
+            'categories'   => $this->categories->findAll($userId),
         ];
     }
 }

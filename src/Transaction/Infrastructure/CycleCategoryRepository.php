@@ -15,11 +15,11 @@ final class CycleCategoryRepository implements CategoryRepositoryInterface
     }
 
     #[\NoDiscard]
-    public function findAll(): array
+    public function findAll(int $userId): array
     {
         /** @var array<int, array{name: string}> $rows */
         $rows = $this->dbal->database()
-            ->query('SELECT name FROM categories ORDER BY name')
+            ->query('SELECT name FROM categories WHERE user_id = ? ORDER BY name', [$userId])
             ->fetchAll();
 
         return array_map(
@@ -28,27 +28,27 @@ final class CycleCategoryRepository implements CategoryRepositoryInterface
         );
     }
 
-    public function exists(string $name): bool
+    public function exists(string $name, int $userId): bool
     {
         $row = $this->dbal->database()
-            ->query('SELECT 1 FROM categories WHERE name = ?', [$name])
+            ->query('SELECT 1 FROM categories WHERE name = ? AND user_id = ?', [$name, $userId])
             ->fetch();
 
         return $row !== false;
     }
 
-    public function add(string $name): void
+    public function add(string $name, int $userId): void
     {
         $this->dbal->database()
             ->insert('categories')
-            ->values(['name' => trim($name)])
+            ->values(['name' => trim($name), 'user_id' => $userId])
             ->run();
     }
 
-    public function delete(string $name): void
+    public function delete(string $name, int $userId): void
     {
         $this->dbal->database()
-            ->delete('categories', ['name' => $name])
+            ->delete('categories', ['name' => $name, 'user_id' => $userId])
             ->run();
     }
 }

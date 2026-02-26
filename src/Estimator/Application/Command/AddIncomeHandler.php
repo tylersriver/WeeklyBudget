@@ -26,6 +26,6 @@ final class AddIncomeHandler
             throw new \DomainException('Income amount must be positive.');
         }
 
-        $this->estimates->addIncome($name, $amount);
+        $this->estimates->addIncome($name, $amount, $command->userId);
     }
 }

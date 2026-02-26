@@ -1,0 +1,142 @@
+{% extends "layout.html.twig" %}
+
+{% block title %}WeeklyBudget — Simple Personal Budget Tracking{% endblock %}
+
+{% block content %}
+<div class="space-y-16 py-8">
+
+    {# ── Hero ── #}
+    <section class="text-center space-y-6">
+        <h1 class="text-5xl font-extrabold leading-tight">
+            Take Control of Your
+            <span class="text-primary">Weekly Spending</span>
+        </h1>
+        <p class="text-lg opacity-70 max-w-2xl mx-auto">
+            WeeklyBudget helps you track every dollar, set spending limits,
+            and see exactly where your money goes — all in one simple, fast app.
+        </p>
+        <div class="flex justify-center gap-4">
+            <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">Get Started Free</a>
+            <a href="{{ url_for('login') }}" class="btn btn-ghost btn-lg">Sign In</a>
+        </div>
+    </section>
+
+    {# ── How It Works ── #}
+    <section class="space-y-8">
+        <h2 class="text-3xl font-bold text-center">How It Works</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="card bg-base-100 shadow-lg">
+                <div class="card-body items-center text-center">
+                    <div class="text-4xl mb-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                    </div>
+                    <h3 class="card-title">1. Add Transactions</h3>
+                    <p class="opacity-70">
+                        Log every purchase in seconds. Pick a category, add a description and amount — done.
+                    </p>
+                </div>
+            </div>
+
+            <div class="card bg-base-100 shadow-lg">
+                <div class="card-body items-center text-center">
+                    <div class="text-4xl mb-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                    </div>
+                    <h3 class="card-title">2. Track Your Budget</h3>
+                    <p class="opacity-70">
+                        Set a weekly or monthly spending limit. A live progress bar shows how much you have left.
+                    </p>
+                </div>
+            </div>
+
+            <div class="card bg-base-100 shadow-lg">
+                <div class="card-body items-center text-center">
+                    <div class="text-4xl mb-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
+                        </svg>
+                    </div>
+                    <h3 class="card-title">3. See the Big Picture</h3>
+                    <p class="opacity-70">
+                        Visual charts break down spending by category. Browse history by month to spot trends.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# ── Features ── #}
+    <section class="space-y-8">
+        <h2 class="text-3xl font-bold text-center">Everything You Need</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
+            <div class="flex items-start gap-3 p-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-success shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <div>
+                    <h4 class="font-semibold">Weekly & Monthly Budgets</h4>
+                    <p class="text-sm opacity-70">Switch between budget periods with one click.</p>
+                </div>
+            </div>
+            <div class="flex items-start gap-3 p-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-success shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <div>
+                    <h4 class="font-semibold">Custom Categories</h4>
+                    <p class="text-sm opacity-70">Create your own spending categories to match your life.</p>
+                </div>
+            </div>
+            <div class="flex items-start gap-3 p-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-success shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <div>
+                    <h4 class="font-semibold">Spending Charts</h4>
+                    <p class="text-sm opacity-70">Doughnut charts show where your money goes at a glance.</p>
+                </div>
+            </div>
+            <div class="flex items-start gap-3 p-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-success shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <div>
+                    <h4 class="font-semibold">Transaction History</h4>
+                    <p class="text-sm opacity-70">Filter and browse all past spending by month and year.</p>
+                </div>
+            </div>
+            <div class="flex items-start gap-3 p-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-success shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <div>
+                    <h4 class="font-semibold">Budget Estimator</h4>
+                    <p class="text-sm opacity-70">Plan ahead — forecast income vs expenses before the month starts.</p>
+                </div>
+            </div>
+            <div class="flex items-start gap-3 p-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-success shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <div>
+                    <h4 class="font-semibold">Dark Mode</h4>
+                    <p class="text-sm opacity-70">Easy on the eyes — toggle between light and dark themes.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# ── CTA ── #}
+    <section class="text-center space-y-4 pb-8">
+        <h2 class="text-3xl font-bold">Ready to Start Budgeting?</h2>
+        <p class="opacity-70">Create a free account in seconds. No credit card required.</p>
+        <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">Create Your Account</a>
+    </section>
+
+</div>
+{% endblock %}
