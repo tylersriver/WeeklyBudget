@@ -39,4 +39,22 @@ return static function (\PDO $pdo): void {
         $pdo->exec("ALTER TABLE budgets ADD COLUMN active INTEGER NOT NULL DEFAULT 0");
         $pdo->exec("UPDATE budgets SET active = 1 WHERE budgetType = 'weekly'");
     }
+
+    // Create estimate tables if missing
+    $pdo->exec(<<<'SQL'
+        CREATE TABLE IF NOT EXISTS estimate_incomes (
+            id     INTEGER PRIMARY KEY AUTOINCREMENT,
+            name   TEXT NOT NULL,
+            amount REAL NOT NULL
+        )
+    SQL);
+
+    $pdo->exec(<<<'SQL'
+        CREATE TABLE IF NOT EXISTS estimate_expenses (
+            id       INTEGER PRIMARY KEY AUTOINCREMENT,
+            name     TEXT NOT NULL,
+            amount   REAL NOT NULL,
+            category TEXT NOT NULL
+        )
+    SQL);
 };

@@ -59,6 +59,8 @@ $builder->addDefinitions([
         DI\autowire(App\Transaction\Infrastructure\CycleTransactionRepository::class),
     App\Transaction\Domain\CategoryRepositoryInterface::class =>
         DI\autowire(App\Transaction\Infrastructure\CycleCategoryRepository::class),
+    App\Estimator\Domain\EstimateRepositoryInterface::class =>
+        DI\autowire(App\Estimator\Infrastructure\CycleEstimateRepository::class),
 ]);
 
 return $builder->build();
