@@ -72,6 +72,16 @@ return static function (\PDO $pdo): void {
             // Check if this unique index is on the 'name' column alone
             $idxInfo = $pdo->query("PRAGMA index_info({$idx['name']})")->fetchAll(\PDO::FETCH_ASSOC);
             if (count($idxInfo) === 1 && $idxInfo[0]['name'] === 'name') {
+                // Check whether the old table already has user_id
+                $catCols = $pdo->query("PRAGMA table_info(categories)")->fetchAll(\PDO::FETCH_ASSOC);
+                $catHasUserId = false;
+                foreach ($catCols as $col) {
+                    if ($col['name'] === 'user_id') {
+                        $catHasUserId = true;
+                        break;
+                    }
+                }
+
                 // Rebuild table without the UNIQUE constraint
                 $pdo->exec('BEGIN TRANSACTION');
                 $pdo->exec('ALTER TABLE categories RENAME TO categories_old');
@@ -82,7 +92,11 @@ return static function (\PDO $pdo): void {
                         name    TEXT NOT NULL
                     )
                 SQL);
-                $pdo->exec('INSERT INTO categories (id, user_id, name) SELECT id, user_id, name FROM categories_old');
+                if ($catHasUserId) {
+                    $pdo->exec('INSERT INTO categories (id, user_id, name) SELECT id, user_id, name FROM categories_old');
+                } else {
+                    $pdo->exec('INSERT INTO categories (id, user_id, name) SELECT id, 1, name FROM categories_old');
+                }
                 $pdo->exec('DROP TABLE categories_old');
                 $pdo->exec('COMMIT');
                 break;
