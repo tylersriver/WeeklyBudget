@@ -15,7 +15,7 @@ final class LogoutAction
         session_destroy();
 
         return $response
-            ->withHeader('Location', '/login')
+            ->withHeader('Location', '/')
             ->withStatus(302);
     }
 }

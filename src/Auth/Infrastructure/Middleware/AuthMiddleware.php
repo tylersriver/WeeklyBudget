@@ -23,7 +23,7 @@ final class AuthMiddleware implements MiddlewareInterface
 
         if ($userId === null) {
             return (new SlimResponse())
-                ->withHeader('Location', '/login')
+                ->withHeader('Location', '/')
                 ->withStatus(302);
         }
 

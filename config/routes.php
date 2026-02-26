@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Slim\App;
 use Slim\Routing\RouteCollectorProxy;
+use App\Auth\Infrastructure\Action\LandingAction;
 use App\Auth\Infrastructure\Action\LoginAction;
 use App\Auth\Infrastructure\Action\RegisterAction;
 use App\Auth\Infrastructure\Action\LogoutAction;
@@ -16,6 +17,7 @@ use App\Estimator\Infrastructure\Action\EstimatorAction;
 
 return function (App $app): void {
     // ── Public routes (no auth required) ──
+    $app->get('/', LandingAction::class)->setName('landing');
     $app->get('/login', [LoginAction::class, 'showForm'])->setName('login');
     $app->post('/login', [LoginAction::class, 'login'])->setName('login.submit');
     $app->get('/register', [RegisterAction::class, 'showForm'])->setName('register');
@@ -25,7 +27,7 @@ return function (App $app): void {
     // ── Protected routes (auth required) ──
     $app->group('', function (RouteCollectorProxy $group): void {
         // Dashboard
-        $group->get('/', DashboardAction::class)->setName('dashboard');
+        $group->get('/dashboard', DashboardAction::class)->setName('dashboard');
 
         // History
         $group->get('/history', [HistoryAction::class, 'index'])->setName('history');
