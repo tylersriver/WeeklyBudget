@@ -19,7 +19,9 @@ final class DashboardAction
 
     public function __invoke(Request $request, Response $response): Response
     {
-        $data = ($this->getDashboard)();
+        /** @var int $userId */
+        $userId = $request->getAttribute('userId');
+        $data = ($this->getDashboard)($userId);
 
         return $this->view->render($response, 'dashboard.html.twig', $data->toTemplateVars());
     }

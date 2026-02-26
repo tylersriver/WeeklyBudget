@@ -3,17 +3,19 @@
 -- Safe to run multiple times (idempotent).
 --
 
+-- users table
+CREATE TABLE IF NOT EXISTS users (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    email         TEXT NOT NULL UNIQUE,
+    password_hash TEXT NOT NULL,
+    created_at    TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
 -- categories table
 CREATE TABLE IF NOT EXISTS categories (
     id   INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL UNIQUE
 );
-
-INSERT OR IGNORE INTO categories (id, name) VALUES (1, 'Food');
-INSERT OR IGNORE INTO categories (id, name) VALUES (2, 'Groceries');
-INSERT OR IGNORE INTO categories (id, name) VALUES (3, 'Gas');
-INSERT OR IGNORE INTO categories (id, name) VALUES (4, 'Shopping');
-INSERT OR IGNORE INTO categories (id, name) VALUES (5, 'Other');
 
 -- estimate tables
 CREATE TABLE IF NOT EXISTS estimate_incomes (

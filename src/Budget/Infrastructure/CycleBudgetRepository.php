@@ -18,13 +18,13 @@ final class CycleBudgetRepository implements BudgetRepositoryInterface
     }
 
     #[\NoDiscard]
-    public function findByType(BudgetType $type): ?Budget
+    public function findByType(BudgetType $type, int $userId): ?Budget
     {
         /** @var array{id: int|string, budgetType: string, amount: int|float|string, active: int|string}|false $row */
         $row = $this->dbal->database()
             ->query(
-                'SELECT id, budgetType, amount, active FROM budgets WHERE budgetType = ?',
-                [$type->value]
+                'SELECT id, budgetType, amount, active FROM budgets WHERE budgetType = ? AND user_id = ?',
+                [$type->value, $userId]
             )
             ->fetch();
 
@@ -41,11 +41,14 @@ final class CycleBudgetRepository implements BudgetRepositoryInterface
     }
 
     #[\NoDiscard]
-    public function findActive(): ?Budget
+    public function findActive(int $userId): ?Budget
     {
         /** @var array{id: int|string, budgetType: string, amount: int|float|string, active: int|string}|false $row */
         $row = $this->dbal->database()
-            ->query('SELECT id, budgetType, amount, active FROM budgets WHERE active = 1 LIMIT 1')
+            ->query(
+                'SELECT id, budgetType, amount, active FROM budgets WHERE active = 1 AND user_id = ? LIMIT 1',
+                [$userId]
+            )
             ->fetch();
 
         if ($row === false) {
@@ -61,30 +64,30 @@ final class CycleBudgetRepository implements BudgetRepositoryInterface
     }
 
     #[\NoDiscard]
-    public function findAll(): array
+    public function findAll(int $userId): array
     {
         /** @var array<int, array<string, mixed>> */
         return $this->dbal->database()
-            ->query('SELECT budgetType, amount, active FROM budgets')
+            ->query('SELECT budgetType, amount, active FROM budgets WHERE user_id = ?', [$userId])
             ->fetchAll();
     }
 
-    public function save(Budget $budget): void
+    public function save(Budget $budget, int $userId): void
     {
         $this->dbal->database()
             ->update(
                 'budgets',
                 ['amount' => (int) $budget->getAmount()->toFloat()],
-                ['budgetType' => $budget->getType()->value],
+                ['budgetType' => $budget->getType()->value, 'user_id' => $userId],
             )
             ->run();
     }
 
-    public function activateByType(BudgetType $type): void
+    public function activateByType(BudgetType $type, int $userId): void
     {
         $db = $this->dbal->database();
 
-        $db->update('budgets', ['active' => 0], [])->run();
-        $db->update('budgets', ['active' => 1], ['budgetType' => $type->value])->run();
+        $db->update('budgets', ['active' => 0], ['user_id' => $userId])->run();
+        $db->update('budgets', ['active' => 1], ['budgetType' => $type->value, 'user_id' => $userId])->run();
     }
 }

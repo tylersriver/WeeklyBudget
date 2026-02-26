@@ -9,6 +9,7 @@ readonly class AddIncomeCommand
     public function __construct(
         public string $name,
         public string $amount,
+        public int $userId,
     ) {
     }
 }

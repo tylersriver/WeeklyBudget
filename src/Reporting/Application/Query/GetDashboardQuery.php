@@ -21,22 +21,22 @@ final class GetDashboardQuery
     }
 
     #[\NoDiscard]
-    public function __invoke(): DashboardData
+    public function __invoke(int $userId): DashboardData
     {
-        $activeBudget = $this->budgets->findActive();
+        $activeBudget = $this->budgets->findActive($userId);
         $activeType   = $activeBudget?->getType() ?? BudgetType::Weekly;
         $limit        = $activeBudget?->getAmount() ?? MoneyAmount::zero();
 
         $spent = $activeType === BudgetType::Weekly
-            ? $this->transactions->weeklySpent()
-            : $this->transactions->monthlySpent();
+            ? $this->transactions->weeklySpent($userId)
+            : $this->transactions->monthlySpent($userId);
 
-        $categoryData = $this->transactions->monthlySpendingByCategory();
+        $categoryData = $this->transactions->monthlySpendingByCategory($userId);
 
         return new DashboardData(
             budget:       new SpendingSummary($activeType, $limit, $spent),
-            transactions: $this->transactions->transactionsThisWeek(),
-            categories:   $this->categories->findAll(),
+            transactions: $this->transactions->transactionsThisWeek($userId),
+            categories:   $this->categories->findAll($userId),
             chartLabels:  array_keys($categoryData),
             chartData:    array_values($categoryData),
         );

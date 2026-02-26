@@ -15,14 +15,14 @@ describe('UpdateBudgetHandler', function () {
         $saved = null;
 
         $repo = Mockery::mock(BudgetRepositoryInterface::class);
-        $repo->allows('findByType')->with(BudgetType::Weekly)->andReturn($existing);
+        $repo->allows('findByType')->with(BudgetType::Weekly, 1)->andReturn($existing);
         $repo->allows('save')->with(Mockery::on(function (Budget $budget) use (&$saved) {
             $saved = $budget;
             return true;
-        }));
+        }), 1);
 
         $handler = new UpdateBudgetHandler($repo);
-        $result = $handler(new UpdateBudgetCommand(type: 'weekly', amount: 300));
+        $result = $handler(new UpdateBudgetCommand(type: 'weekly', amount: 300, userId: 1));
 
         expect($result)->toBeTrue();
         expect($saved)->not->toBeNull();
@@ -33,7 +33,7 @@ describe('UpdateBudgetHandler', function () {
         $repo = Mockery::mock(BudgetRepositoryInterface::class);
         $handler = new UpdateBudgetHandler($repo);
 
-        $result = $handler(new UpdateBudgetCommand(type: 'invalid', amount: 100));
+        $result = $handler(new UpdateBudgetCommand(type: 'invalid', amount: 100, userId: 1));
 
         expect($result)->toBeFalse();
     });
@@ -42,17 +42,17 @@ describe('UpdateBudgetHandler', function () {
         $repo = Mockery::mock(BudgetRepositoryInterface::class);
         $handler = new UpdateBudgetHandler($repo);
 
-        $result = $handler(new UpdateBudgetCommand(type: 'weekly', amount: 0));
+        $result = $handler(new UpdateBudgetCommand(type: 'weekly', amount: 0, userId: 1));
 
         expect($result)->toBeFalse();
     });
 
     it('returns false when budget not found', function () {
         $repo = Mockery::mock(BudgetRepositoryInterface::class);
-        $repo->allows('findByType')->with(BudgetType::Monthly)->andReturn(null);
+        $repo->allows('findByType')->with(BudgetType::Monthly, 1)->andReturn(null);
 
         $handler = new UpdateBudgetHandler($repo);
-        $result = $handler(new UpdateBudgetCommand(type: 'monthly', amount: 500));
+        $result = $handler(new UpdateBudgetCommand(type: 'monthly', amount: 500, userId: 1));
 
         expect($result)->toBeFalse();
     });

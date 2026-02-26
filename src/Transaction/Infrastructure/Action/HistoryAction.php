@@ -22,7 +22,7 @@ final class HistoryAction
         $month = (int) date('n');
         $year  = (int) date('Y');
 
-        return $this->renderHistory($response, $month, $year);
+        return $this->renderHistory($request, $response, $month, $year);
     }
 
     public function filter(Request $request, Response $response): Response
@@ -32,12 +32,14 @@ final class HistoryAction
         $month = (int) ($body['month'] ?? date('n'));
         $year  = (int) ($body['year']  ?? date('Y'));
 
-        return $this->renderHistory($response, $month, $year);
+        return $this->renderHistory($request, $response, $month, $year);
     }
 
-    private function renderHistory(Response $response, int $month, int $year): Response
+    private function renderHistory(Request $request, Response $response, int $month, int $year): Response
     {
-        $data = ($this->getMonthlyTransactions)($month, $year);
+        /** @var int $userId */
+        $userId = $request->getAttribute('userId');
+        $data = ($this->getMonthlyTransactions)($month, $year, $userId);
 
         return $this->view->render($response, 'history.html.twig', $data);
     }

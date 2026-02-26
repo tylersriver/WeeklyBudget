@@ -16,8 +16,8 @@ final class GetBudgetByTypeQuery
     }
 
     #[\NoDiscard]
-    public function __invoke(BudgetType $type): ?Budget
+    public function __invoke(BudgetType $type, int $userId): ?Budget
     {
-        return $this->budgets->findByType($type);
+        return $this->budgets->findByType($type, $userId);
     }
 }

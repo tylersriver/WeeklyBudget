@@ -28,7 +28,7 @@ describe('ContainerCommandBus', function () {
             ->andReturn($handler);
 
         $bus = new ContainerCommandBus($container);
-        $command = new App\Budget\Application\Command\UpdateBudgetCommand(type: 'weekly', amount: 300);
+        $command = new App\Budget\Application\Command\UpdateBudgetCommand(type: 'weekly', amount: 300, userId: 1);
         $result = $bus->dispatch($command);
 
         expect($result)->toBe('handled');
@@ -52,7 +52,7 @@ describe('ContainerCommandBus', function () {
         $bus = new ContainerCommandBus($container);
 
         $bus->dispatch(
-            new App\Budget\Application\Command\UpdateBudgetCommand(type: 'weekly', amount: 100)
+            new App\Budget\Application\Command\UpdateBudgetCommand(type: 'weekly', amount: 100, userId: 1)
         );
     })->throws(RuntimeException::class, 'No handler registered for');
 });

@@ -10,6 +10,7 @@ readonly class AddExpenseCommand
         public string $name,
         public string $amount,
         public string $category,
+        public int $userId,
     ) {
     }
 }

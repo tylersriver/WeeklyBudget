@@ -26,14 +26,14 @@ final class UpdateBudgetHandler
             return false;
         }
 
-        $budget = $this->budgets->findByType($type);
+        $budget = $this->budgets->findByType($type, $command->userId);
 
         if ($budget === null) {
             return false;
         }
 
         $updated = $budget->updateAmount(MoneyAmount::fromFloat((float) $command->amount));
-        $this->budgets->save($updated);
+        $this->budgets->save($updated, $command->userId);
 
         return true;
     }

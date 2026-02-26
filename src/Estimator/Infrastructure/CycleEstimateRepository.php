@@ -20,16 +20,16 @@ final class CycleEstimateRepository implements EstimateRepositoryInterface
     }
 
     #[\NoDiscard]
-    public function find(): Estimate
+    public function find(int $userId): Estimate
     {
         /** @var array<int, array{id: int|string, name: string, amount: int|float|string}> $incomeRows */
         $incomeRows = $this->dbal->database()
-            ->query('SELECT id, name, amount FROM estimate_incomes ORDER BY id')
+            ->query('SELECT id, name, amount FROM estimate_incomes WHERE user_id = ? ORDER BY id', [$userId])
             ->fetchAll();
 
         /** @var array<int, array{id: int|string, name: string, amount: int|float|string, category: string}> $expenseRows */
         $expenseRows = $this->dbal->database()
-            ->query('SELECT id, name, amount, category FROM estimate_expenses ORDER BY id')
+            ->query('SELECT id, name, amount, category FROM estimate_expenses WHERE user_id = ? ORDER BY id', [$userId])
             ->fetchAll();
 
         $incomes = array_map(
@@ -54,13 +54,14 @@ final class CycleEstimateRepository implements EstimateRepositoryInterface
         return Estimate::reconstitute($incomes, $expenses);
     }
 
-    public function addIncome(string $name, MoneyAmount $amount): void
+    public function addIncome(string $name, MoneyAmount $amount, int $userId): void
     {
         $this->dbal->database()
             ->insert('estimate_incomes')
             ->values([
-                'name'   => $name,
-                'amount' => $amount->toFloat(),
+                'name'    => $name,
+                'amount'  => $amount->toFloat(),
+                'user_id' => $userId,
             ])
             ->run();
     }
@@ -72,7 +73,7 @@ final class CycleEstimateRepository implements EstimateRepositoryInterface
             ->run();
     }
 
-    public function addExpense(string $name, MoneyAmount $amount, ExpenseCategory $category): void
+    public function addExpense(string $name, MoneyAmount $amount, ExpenseCategory $category, int $userId): void
     {
         $this->dbal->database()
             ->insert('estimate_expenses')
@@ -80,6 +81,7 @@ final class CycleEstimateRepository implements EstimateRepositoryInterface
                 'name'     => $name,
                 'amount'   => $amount->toFloat(),
                 'category' => $category->value,
+                'user_id'  => $userId,
             ])
             ->run();
     }

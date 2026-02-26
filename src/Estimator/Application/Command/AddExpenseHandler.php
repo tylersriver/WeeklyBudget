@@ -32,6 +32,6 @@ final class AddExpenseHandler
             throw new \DomainException('Expense amount must be positive.');
         }
 
-        $this->estimates->addExpense($name, $amount, $category);
+        $this->estimates->addExpense($name, $amount, $category, $command->userId);
     }
 }

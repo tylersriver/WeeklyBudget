@@ -1,0 +1,58 @@
+{% extends "layout.html.twig" %}
+
+{% block title %}Register — WeeklyBudget{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-center min-h-[60vh]">
+    <div class="card bg-base-100 shadow-xl w-full max-w-md">
+        <div class="card-body">
+            <h2 class="card-title text-2xl font-bold justify-center mb-4">Create Account</h2>
+
+            {% if error is defined and error %}
+                <div class="alert alert-error mb-4">
+                    <span>{{ error }}</span>
+                </div>
+            {% endif %}
+
+            <form method="post" action="{{ url_for('register.submit') }}" class="space-y-4">
+                <div class="form-control">
+                    <label class="label" for="email">
+                        <span class="label-text">Email</span>
+                    </label>
+                    <input type="email" id="email" name="email" required
+                           value="{{ email ?? '' }}"
+                           placeholder="you@example.com"
+                           class="input input-bordered w-full" />
+                </div>
+
+                <div class="form-control">
+                    <label class="label" for="password">
+                        <span class="label-text">Password</span>
+                    </label>
+                    <input type="password" id="password" name="password" required
+                           minlength="8"
+                           placeholder="At least 8 characters"
+                           class="input input-bordered w-full" />
+                </div>
+
+                <div class="form-control">
+                    <label class="label" for="confirm_password">
+                        <span class="label-text">Confirm Password</span>
+                    </label>
+                    <input type="password" id="confirm_password" name="confirm_password" required
+                           minlength="8"
+                           placeholder="Re-enter your password"
+                           class="input input-bordered w-full" />
+                </div>
+
+                <button type="submit" class="btn btn-primary w-full">Create Account</button>
+            </form>
+
+            <p class="text-center text-sm mt-4">
+                Already have an account?
+                <a href="{{ url_for('login') }}" class="link link-primary">Sign in</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

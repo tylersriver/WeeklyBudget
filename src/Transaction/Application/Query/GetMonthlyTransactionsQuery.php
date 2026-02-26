@@ -22,11 +22,11 @@ final class GetMonthlyTransactionsQuery
      * }
      */
     #[\NoDiscard]
-    public function __invoke(int $month, int $year): array
+    public function __invoke(int $month, int $year, int $userId): array
     {
         return [
-            'transactions'  => $this->transactions->transactionsForMonth($year, $month),
-            'years'         => $this->transactions->yearsWithTransactions(),
+            'transactions'  => $this->transactions->transactionsForMonth($year, $month, $userId),
+            'years'         => $this->transactions->yearsWithTransactions($userId),
             'selectedMonth' => $month,
             'selectedYear'  => $year,
         ];
